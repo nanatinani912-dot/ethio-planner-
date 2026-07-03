@@ -1,0 +1,18 @@
+{
+  "name": "ethio-planner-backend",
+  "version": "1.0.0",
+  "description": "Ethio Planner Backend API (Node.js + Express + SQLite)",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.18.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

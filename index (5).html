@@ -1,0 +1,2669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Ethio Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Noto+Serif+Ethiopic:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+/* ═══════════════════════════════════════════════════
+   ETHIO PLANNER — app.css (all styles in one file)
+═══════════════════════════════════════════════════ */
+:root {
+  --pri:#6c63ff; --pri-l:#a29bfe; --pri-d:#4834d4;
+  --acc:#00c8a0; --danger:#e94b77; --warn:#f5a623;
+  --ok:#27ae60;
+  --bg:#f5f6fa; --card:#ffffff; --text:#2d3436;
+  --muted:#636e72; --border:#dfe6e9;
+  --shadow:0 2px 14px rgba(108,99,255,.10);
+  --rad:14px; --rad-s:8px;
+  --top:60px; --bot:64px;
+  --font:'Poppins','Noto Serif Ethiopic',sans-serif;
+}
+body.theme-dark{--bg:#1a1a2e;--card:#16213e;--text:#edf2f4;--muted:#b2bec3;--border:#2d3561;--shadow:0 2px 16px rgba(0,0,0,.35);--pri:#a29bfe;--pri-l:#6c63ff;}
+body.theme-male{--pri:#1565c0;--pri-l:#1e88e5;--acc:#0288d1;--bg:#eaf2fb;--card:#ffffff;}
+body.theme-female{--pri:#e84393;--pri-l:#fd79a8;--acc:#fdcb6e;--bg:#fff0f6;--card:#fff8fb;}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}
+#app{display:flex;flex-direction:column;min-height:100vh}
+
+/* TOP BAR */
+.top-bar{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--top);background:var(--card);border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;box-shadow:var(--shadow)}
+.app-logo{display:flex;align-items:center;gap:8px;font-size:1.1rem;font-weight:800;color:var(--pri)}
+.logo-text{font-size:1.05rem}
+.top-bar-right{display:flex;align-items:center;gap:8px}
+.icon-btn{background:none;border:none;cursor:pointer;font-size:1.15rem;color:var(--muted);position:relative;padding:6px;border-radius:50%;transition:background .2s}
+.icon-btn:hover{background:var(--border)}
+.badge{position:absolute;top:2px;right:2px;background:var(--danger);color:#fff;font-size:.52rem;font-weight:700;border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center}
+.avatar-mini{width:34px;height:34px;border-radius:50%;background:var(--pri);cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;border:2px solid var(--pri-l);font-weight:700;color:#fff;font-size:.95rem}
+.avatar-mini img{width:100%;height:100%;object-fit:cover}
+
+/* PAGES */
+.pages-container{margin-top:var(--top);margin-bottom:var(--bot);flex:1;overflow-y:auto;padding:14px 12px}
+.page{display:none;animation:fadeUp .3s}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;height:var(--bot);background:var(--card);border-top:1.5px solid var(--border);display:flex;box-shadow:0 -2px 10px rgba(0,0,0,.07)}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:var(--muted);font-size:.7rem;font-family:var(--font);gap:3px;transition:color .2s}
+.bnav-item i{font-size:1.25rem}
+.bnav-item.active,.bnav-item.active i{color:var(--pri)}
+
+/* PAGE TITLE */
+.page-title-bar{margin-bottom:14px}
+.page-title-bar h2{font-size:1.05rem;font-weight:800;color:var(--pri);display:flex;align-items:center;gap:8px}
+
+/* ═══ HOME SECTION CARDS (collapsed/expanded) ═══ */
+.home-section-card{background:var(--card);border-radius:var(--rad);margin-bottom:14px;border:1.5px solid var(--border);box-shadow:var(--shadow);overflow:hidden}
+.hsc-header{display:flex;align-items:center;gap:10px;padding:16px 16px;cursor:pointer;user-select:none;transition:background .15s}
+.hsc-header:hover{background:var(--bg)}
+.hsc-icon{font-size:1.35rem}
+.hsc-title{flex:1;font-size:1rem;font-weight:700;color:var(--pri)}
+.hsc-arrow{color:var(--muted);transition:transform .3s;font-size:.85rem}
+.hsc-body{padding:0 14px 14px}
+.hsc-body.collapsed{display:none}
+
+/* VIEW TABS */
+.view-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.vtab{background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:5px 13px;font-size:.78rem;font-family:var(--font);color:var(--muted);cursor:pointer;transition:all .2s}
+.vtab.active,.vtab:hover{background:var(--pri);color:#fff;border-color:var(--pri)}
+
+/* SCHEDULER SECTION */
+.cal-type-row{display:flex;gap:6px;margin-bottom:10px}
+.cal-type-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:5px 14px;font-size:.78rem;font-family:var(--font);cursor:pointer;color:var(--muted);transition:all .2s}
+.cal-type-btn.active{background:var(--pri);color:#fff;border-color:var(--pri)}
+.today-label-bar{background:linear-gradient(135deg,var(--pri),var(--acc));color:#fff;border-radius:var(--rad-s);padding:8px 14px;font-size:.82rem;font-weight:600;margin-bottom:10px;line-height:1.5}
+.date-jump-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.dj-label{font-size:.78rem;color:var(--muted);font-weight:600;white-space:nowrap}
+.dj-input{border:1.5px solid var(--border);border-radius:var(--rad-s);padding:5px 9px;font-family:var(--font);font-size:.82rem;background:var(--bg);color:var(--text)}
+.dj-input:focus{outline:none;border-color:var(--pri)}
+.sv{display:none}
+.sv.active{display:block}
+.cal-nav-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-nav-title{font-size:.9rem;font-weight:700;color:var(--text);flex:1;text-align:center}
+.nav-arrow{background:none;border:1.5px solid var(--border);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:all .2s;font-size:.82rem}
+.nav-arrow:hover{background:var(--pri);color:#fff;border-color:var(--pri)}
+
+/* DAY EVENTS */
+.day-events-area{min-height:50px;margin-bottom:8px}
+.day-event-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg);border-radius:var(--rad-s);border-left:3px solid var(--pri);margin-bottom:5px;font-size:.83rem}
+.day-event-item.done{border-left-color:var(--ok);opacity:.65}
+.day-event-item.done .dei-title{text-decoration:line-through}
+.dei-sticker{font-size:1.1rem}
+.dei-title{flex:1;font-weight:600}
+.dei-time{font-size:.75rem;color:var(--muted)}
+.dei-alarm-ic{color:var(--warn);font-size:.78rem}
+.dei-done-toggle{cursor:pointer;font-size:.95rem;user-select:none}
+.dei-del{background:none;border:none;color:var(--danger);cursor:pointer;font-size:.82rem;padding:2px}
+.no-events-msg{color:var(--muted);font-size:.82rem;text-align:center;padding:10px 0}
+.add-fab{background:var(--pri);color:#fff;border:none;border-radius:var(--rad-s);padding:9px 18px;font-family:var(--font);font-size:.83rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-top:6px;transition:background .2s}
+.add-fab:hover{background:var(--pri-d)}
+
+/* WEEK GRID */
+.week-grid-wrap{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.wg-col{display:flex;flex-direction:column}
+.wg-day-hdr{text-align:center;font-size:.68rem;font-weight:700;color:var(--muted);padding:3px 0;text-transform:uppercase}
+.wg-cell{min-height:66px;background:var(--bg);border-radius:6px;border:1.5px solid var(--border);padding:3px;cursor:pointer;position:relative;transition:border-color .2s}
+.wg-cell:hover{border-color:var(--pri)}
+.wg-cell.today{border-color:var(--pri);background:rgba(108,99,255,.08)}
+.wg-num{font-size:.72rem;font-weight:700;color:var(--muted)}
+.wg-cell.today .wg-num{color:var(--pri)}
+.wg-evt{font-size:.6rem;background:var(--pri);color:#fff;border-radius:3px;padding:1px 3px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wg-add{position:absolute;bottom:2px;right:2px;background:var(--pri);color:#fff;border:none;border-radius:50%;width:16px;height:16px;font-size:.6rem;cursor:pointer;display:none;align-items:center;justify-content:center}
+.wg-cell:hover .wg-add{display:flex}
+
+/* MONTH GRID */
+.month-grid-wrap{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mg-hdr{text-align:center;font-size:.65rem;font-weight:700;color:var(--muted);padding:4px 0;text-transform:uppercase}
+.mg-day{min-height:46px;background:var(--bg);border-radius:5px;border:1.5px solid var(--border);padding:2px;cursor:pointer;position:relative;transition:border-color .2s}
+.mg-day:hover{border-color:var(--pri)}
+.mg-day.today{background:var(--pri);border-color:var(--pri)}
+.mg-day.today .mg-num{color:#fff;font-weight:800}
+.mg-day.other-month{opacity:.3}
+.mg-num{font-size:.7rem;font-weight:700;color:var(--text)}
+.mg-eth{font-size:.55rem;color:var(--muted)}
+.mg-dot{width:5px;height:5px;border-radius:50%;background:var(--acc);margin:1px auto}
+.mg-add{position:absolute;bottom:2px;right:2px;background:var(--pri);color:#fff;border:none;border-radius:50%;width:14px;height:14px;font-size:.58rem;cursor:pointer;display:none;align-items:center;justify-content:center}
+.mg-day:hover .mg-add{display:flex}
+
+/* ═══ PLANNER DESIGNER ═══ */
+.planner-date-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;padding:8px 12px;background:var(--bg);border-radius:var(--rad-s);border:1px solid var(--border);font-size:.85rem;font-weight:600;color:var(--text)}
+.cal-nav-inline{display:flex;gap:5px}
+.pv{display:none}
+.pv.active{display:block}
+.planner-block{background:var(--bg);border-radius:var(--rad-s);border:1px solid var(--border);padding:12px;margin-bottom:10px}
+.pb-title{font-size:.82rem;font-weight:700;color:var(--pri);margin-bottom:8px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.4px}
+.pb-list{display:flex;flex-direction:column;gap:2px}
+.pb-item{display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px dashed var(--border)}
+.pb-item:last-child{border-bottom:none}
+.pb-item input[type=checkbox]{width:15px;height:15px;accent-color:var(--pri);cursor:pointer;flex-shrink:0}
+.pb-item .pbi-text{flex:1;border:none;background:none;font-family:var(--font);font-size:.83rem;color:var(--text);outline:none;padding:2px 4px;border-radius:3px}
+.pb-item.done .pbi-text{text-decoration:line-through;color:var(--muted)}
+.pb-item .pbi-del{background:none;border:none;color:var(--danger);cursor:pointer;font-size:.78rem;opacity:0;transition:opacity .2s}
+.pb-item:hover .pbi-del{opacity:1}
+.pbi-alarm{cursor:pointer;color:var(--border);font-size:.78rem;flex-shrink:0;transition:color .2s}
+.pbi-alarm.on{color:var(--warn)}
+.pb-item:hover .pbi-alarm{color:var(--muted)}
+.pb-item:hover .pbi-alarm.on{color:var(--warn)}
+.pb-add-btn{background:none;border:1.5px dashed var(--border);border-radius:var(--rad-s);padding:5px 12px;font-family:var(--font);font-size:.78rem;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:5px;margin-top:5px;transition:all .2s}
+.pb-add-btn:hover{border-color:var(--pri);color:var(--pri)}
+.pb-notes{width:100%;border:1.5px solid var(--border);border-radius:var(--rad-s);padding:8px 10px;font-family:var(--font);font-size:.83rem;background:var(--card);color:var(--text);resize:vertical;min-height:70px}
+.pb-notes:focus{outline:none;border-color:var(--pri)}
+.planner-save-row{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+
+/* Schedule table */
+.schedule-scroll{overflow-x:auto}
+.sched-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.sched-table th{background:var(--pri);color:#fff;padding:5px 7px;text-align:left;font-size:.74rem;white-space:nowrap}
+.sched-table td{padding:3px 7px;border-bottom:1px solid var(--border)}
+.sched-table td.time-cell{font-size:.72rem;color:var(--muted);font-weight:700;white-space:nowrap;background:var(--bg)}
+.sched-table td input{border:none;background:none;width:100%;font-family:var(--font);font-size:.8rem;color:var(--text);outline:none;min-width:50px}
+.sched-table .sched-time-input{font-weight:700;color:var(--text);min-width:56px}
+.sched-table tr:hover td{background:rgba(108,99,255,.04)}
+.sched-alarm-toggle{cursor:pointer;color:var(--border);font-size:.85rem;transition:color .2s}
+.sched-alarm-toggle.on{color:var(--warn)}
+.sched-done-toggle{cursor:pointer;font-size:.9rem;user-select:none}
+.sched-row-del{background:none;border:none;color:var(--danger);cursor:pointer;font-size:.75rem;opacity:.55;padding:2px}
+.sched-row-del:hover{opacity:1}
+.sched-add-row-btn{width:100%;margin-top:8px;background:var(--bg);border:1.5px dashed var(--border);border-radius:var(--rad-s);color:var(--pri);font-weight:700;font-size:.78rem;padding:8px;cursor:pointer;font-family:var(--font)}
+.sched-add-row-btn:hover{border-color:var(--pri);background:rgba(108,99,255,.06)}
+.preview-btn{background:var(--pri);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap}
+.preview-btn:hover{background:var(--pri-d)}
+.weekly-sched-table{width:100%;border-collapse:collapse;font-size:.76rem}
+.weekly-sched-table th{background:var(--pri);color:#fff;padding:4px;text-align:center;font-size:.7rem;position:sticky;top:0}
+.weekly-sched-table td{padding:3px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.weekly-sched-table td.wst-time{font-size:.68rem;color:var(--muted);font-weight:700;background:var(--bg);white-space:nowrap}
+.weekly-sched-table td input{border:none;background:none;width:100%;font-family:var(--font);font-size:.76rem;color:var(--text);outline:none;min-width:44px}
+
+/* Monthly calendar planner grid */
+.mp-grid-wrap{overflow-x:auto}
+.mp-cal{width:100%;border-collapse:collapse}
+.mp-cal th{padding:5px;text-align:center;font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase}
+.mp-cal td{border:1.5px solid var(--border);border-radius:6px;padding:3px;vertical-align:top;height:50px;cursor:pointer;transition:background .15s;position:relative}
+.mp-cal td:hover{background:var(--bg)}
+.mp-cal td.today{background:var(--pri)}
+.mp-cal td.today .mp-day-n{color:#fff}
+.mp-day-n{font-size:.72rem;font-weight:700;color:var(--text);display:block}
+.mp-day-add{position:absolute;bottom:2px;right:2px;background:var(--pri);color:#fff;border:none;border-radius:50%;width:16px;height:16px;font-size:.6rem;cursor:pointer;display:none;align-items:center;justify-content:center}
+.mp-cal td:hover .mp-day-add{display:flex}
+.mp-day-evt{font-size:.58rem;background:var(--acc);color:#fff;border-radius:3px;padding:1px 3px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* MY FILES */
+.myfiles-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.myfiles-header h4{font-size:.9rem;font-weight:700;color:var(--pri);display:flex;align-items:center;gap:7px}
+.mf-hint{font-size:.72rem;color:var(--muted)}
+.myfiles-list{display:flex;flex-direction:column;gap:7px}
+.mf-item{background:var(--bg);border-radius:var(--rad-s);border:1.5px solid var(--border);padding:10px 12px;display:flex;align-items:flex-start;gap:10px;transition:border-color .2s}
+.mf-item:hover{border-color:var(--pri)}
+.mf-item.pinned{border-color:var(--warn);border-left:4px solid var(--warn)}
+.mf-info{flex:1}
+.mf-type{font-size:.68rem;font-weight:700;color:var(--pri);text-transform:uppercase;letter-spacing:.5px}
+.mf-date{font-size:.75rem;font-weight:600;color:var(--text);margin:2px 0}
+.mf-preview{font-size:.75rem;color:var(--muted)}
+.mf-actions{display:flex;gap:5px}
+.mf-btn{background:none;border:1.5px solid var(--border);border-radius:var(--rad-s);padding:4px 9px;font-size:.75rem;cursor:pointer;color:var(--muted);transition:all .2s;font-family:var(--font)}
+.mf-btn:hover{border-color:var(--pri);color:var(--pri)}
+.mf-btn.pin-active{border-color:var(--warn);color:var(--warn)}
+.mf-btn.del-btn:hover{border-color:var(--danger);color:var(--danger)}
+
+/* ═══ PERIOD TRACKER ═══ */
+.period-tracker-wrap{display:flex;flex-direction:column;gap:14px}
+.pt-input-card{background:var(--bg);border-radius:var(--rad-s);border:1px solid var(--border);padding:14px}
+.pt-input-title{font-size:.85rem;font-weight:700;color:var(--pri);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.pt-input-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.pt-field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px}
+.pt-field label{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase}
+.pt-input{border:1.5px solid var(--border);border-radius:var(--rad-s);padding:7px 10px;font-family:var(--font);font-size:.83rem;background:var(--card);color:var(--text);width:100%}
+.pt-input:focus{outline:none;border-color:var(--pri)}
+.pt-prediction-row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:600px){.pt-prediction-row{grid-template-columns:repeat(4,1fr)}}
+.pt-pred-card{border-radius:var(--rad-s);padding:12px;text-align:center;border:2px solid transparent}
+.pt-pred-card.green{background:#e8f8f3;border-color:var(--acc)}
+.pt-pred-card.blue{background:#e8f0ff;border-color:var(--pri)}
+.pt-pred-card.pink{background:#fff0f6;border-color:var(--danger)}
+.pt-pred-card.purple{background:#f5f0ff;border-color:#8e44ad}
+body.theme-dark .pt-pred-card{background:var(--bg)}
+.pt-pred-emoji{font-size:1.6rem;margin-bottom:4px}
+.pt-pred-label{font-size:.7rem;font-weight:600;color:var(--muted);margin-bottom:3px}
+.pt-pred-val{font-size:.88rem;font-weight:800;color:var(--text);line-height:1.3}
+.pt-tracker-section,.pt-cycle-length-section,.pt-notes-section,.pt-history-section{background:var(--bg);border-radius:var(--rad-s);border:1px solid var(--border);padding:12px}
+.pt-tracker-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.pt-tracker-title{font-size:.88rem;font-weight:700;color:var(--pri);display:flex;align-items:center;gap:6px}
+.pt-year-label{font-size:.82rem;font-weight:700;color:var(--muted)}
+.pt-grid-scroll{overflow-x:auto}
+.pt-tracker-table{border-collapse:collapse;font-size:.7rem;min-width:520px;width:100%}
+.pt-tracker-table th{padding:4px 5px;text-align:center;font-weight:700;color:var(--muted);border:1px solid var(--border);font-size:.68rem;white-space:nowrap}
+.pt-tracker-table th.day-hdr{background:var(--bg);width:28px;min-width:28px}
+.pt-tracker-table th.month-hdr{background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;min-width:30px}
+.pt-tracker-table td{width:30px;min-width:30px;height:24px;border:1px solid var(--border);text-align:center;cursor:pointer;position:relative;transition:background .15s;vertical-align:middle}
+.pt-tracker-table td:hover{opacity:.8}
+.pt-tracker-table td.day-num-cell{background:var(--bg);font-weight:700;color:var(--text);cursor:default;width:24px;font-size:.7rem}
+.pt-tracker-table td.flow-light{background:#ffb3c6}
+.pt-tracker-table td.flow-medium{background:#ff6b9d}
+.pt-tracker-table td.flow-heavy{background:#c9184a}
+.pt-tracker-table td.flow-ovulation{background:#a8edea}
+.pt-tracker-table td.pain-indicator::after{content:attr(data-pain);font-size:.55rem;position:absolute;bottom:0;right:0;line-height:1}
+.pt-legend{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+.pt-legend-row{display:flex;flex-wrap:wrap;gap:10px}
+.pt-leg-item{display:flex;align-items:center;gap:5px;font-size:.73rem;color:var(--muted)}
+.pt-leg-dot{width:12px;height:12px;border-radius:50%;border:1px solid var(--border);flex-shrink:0}
+.flow-light{background:#ffb3c6}.flow-medium{background:#ff6b9d}.flow-heavy{background:#c9184a}.flow-ovulation{background:#a8edea}
+.pt-pain-icon{font-size:.75rem}
+.pt-cycle-len-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.pt-cycle-len-table td,.pt-cycle-len-table th{padding:5px 8px;border:1px solid var(--border);text-align:left}
+.pt-cycle-len-table th{background:var(--pri);color:#fff;font-size:.75rem}
+.pt-cycle-len-table td:first-child{font-weight:700;color:var(--pri);background:var(--bg)}
+.pt-notes-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.pt-notes-table td,.pt-notes-table th{padding:5px 8px;border:1px solid var(--border);vertical-align:top}
+.pt-notes-table th{background:var(--pri);color:#fff;font-size:.75rem}
+.pt-notes-table td:first-child{font-weight:700;color:var(--pri);background:var(--bg);white-space:nowrap;width:50px}
+.pt-notes-table textarea{border:none;background:none;width:100%;font-family:var(--font);font-size:.78rem;color:var(--text);outline:none;resize:none;min-height:30px}
+.pt-history-list{display:flex;flex-direction:column;gap:5px}
+.pt-hist-item{display:flex;justify-content:space-between;align-items:center;background:var(--card);border-radius:var(--rad-s);padding:7px 10px;font-size:.78rem;border:1px solid var(--border)}
+
+/* ═══ CALENDAR PAGE ═══ */
+.cal-toggle-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.cal-toggle-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:5px 14px;font-size:.78rem;font-family:var(--font);cursor:pointer;color:var(--muted);transition:all .2s}
+.cal-toggle-btn.active{background:var(--pri);color:#fff;border-color:var(--pri)}
+.cal-panels-row{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:18px}
+.cal-panels-row.two-cols{grid-template-columns:1fr 1fr}
+@media(max-width:680px){.cal-panels-row.two-cols{grid-template-columns:1fr}}
+.cal-full-panel{background:var(--card);border-radius:var(--rad);border:1.5px solid var(--border);padding:12px;box-shadow:var(--shadow)}
+.cfp-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cfp-nav h3{font-size:.9rem;font-weight:700;color:var(--pri);flex:1;text-align:center}
+.cfp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cfg-hdr{text-align:center;font-size:.63rem;font-weight:700;color:var(--muted);padding:3px 0;text-transform:uppercase}
+.cfg-day{min-height:34px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:2px 1px;background:var(--bg);border-radius:5px;border:1.5px solid transparent;cursor:pointer;transition:all .15s;position:relative}
+.cfg-day:hover{border-color:var(--pri)}
+.cfg-day.today{background:var(--pri);border-color:var(--pri)}
+.cfg-day.today .cfg-num,.cfg-day.today .cfg-eth{color:#fff}
+.cfg-day.other-month{opacity:.25}
+.cfg-day.holiday{border-color:var(--warn)}
+.cfg-day.has-event::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:4px;height:4px;background:var(--acc);border-radius:50%}
+.cfg-day.today.has-event::after{background:#fff}
+.cfg-num{font-size:.7rem;font-weight:600;color:var(--text)}
+.cfg-eth{font-size:.53rem;color:var(--muted);font-family:'Noto Serif Ethiopic',serif}
+
+/* HOLIDAYS */
+.holidays-section{background:var(--card);border-radius:var(--rad);border:1.5px solid var(--border);padding:14px;box-shadow:var(--shadow)}
+.holiday-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.htab{background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:4px 12px;font-size:.75rem;font-family:var(--font);cursor:pointer;color:var(--muted);transition:all .2s}
+.htab.active{background:var(--pri);color:#fff;border-color:var(--pri)}
+.hview{display:none}
+.hview.active{display:block}
+.h-list{display:flex;flex-direction:column;gap:5px}
+.h-item{display:flex;align-items:flex-start;gap:9px;background:var(--bg);border-radius:var(--rad-s);padding:8px 10px;border:1px solid var(--border);transition:border-color .2s}
+.h-item:hover{border-color:var(--pri)}
+.h-badge{padding:2px 8px;border-radius:5px;font-size:.65rem;font-weight:700;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.h-badge.public{background:var(--warn);color:#fff}
+.h-badge.orthodox{background:#8e44ad;color:#fff}
+.h-badge.muslim{background:#27ae60;color:#fff}
+.h-badge.feast{background:var(--pri);color:#fff}
+.h-info{flex:1}
+.h-name-en{font-size:.82rem;font-weight:600;color:var(--text)}
+.h-name-am{font-size:.77rem;color:var(--muted);font-family:'Noto Serif Ethiopic',serif}
+.h-date-tag{font-size:.68rem;color:var(--pri);font-weight:700;margin-top:2px}
+.h-photo-thumb{width:36px;height:36px;object-fit:cover;border-radius:5px;border:1.5px solid var(--border);flex-shrink:0}
+
+/* DATE CONVERTER */
+.converter-section{background:var(--card);border-radius:var(--rad);border:1.5px solid var(--border);padding:14px;box-shadow:var(--shadow);margin-bottom:14px;display:flex;flex-direction:column;gap:14px}
+.conv-block{background:var(--bg);border-radius:var(--rad-s);border:1px solid var(--border);padding:12px}
+.conv-title{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:8px}
+.conv-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.conv-num{width:78px;flex:none}
+.conv-result{margin-top:9px;font-size:.85rem;font-weight:700;color:var(--pri);min-height:1.2em}
+.conv-result .conv-sub{display:block;font-size:.72rem;color:var(--muted);font-weight:600;margin-top:2px}
+
+/* PUBLIC HOLIDAY TABLE (multi-language, year-navigable) */
+.ph-year-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:10px}
+.ph-year-label{font-size:1.02rem;font-weight:800;color:var(--text)}
+.ph-table{display:flex;flex-direction:column;gap:7px}
+.ph-row{display:flex;align-items:stretch;gap:10px;background:var(--bg);border-radius:var(--rad-s);border:1px solid var(--border);padding:9px 12px;transition:border-color .2s}
+.ph-row:hover{border-color:var(--pri)}
+.ph-daynum{font-size:1.3rem;font-weight:800;color:var(--muted);min-width:30px;display:flex;align-items:center;justify-content:center}
+.ph-bar{width:4px;border-radius:3px;background:var(--pri);flex-shrink:0}
+.ph-main{flex:1;min-width:0}
+.ph-name-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ph-name{font-size:.86rem;font-weight:700;color:var(--text)}
+.ph-dayoff{background:var(--acc);color:#fff;font-size:.62rem;font-weight:700;padding:2px 9px;border-radius:12px;white-space:nowrap}
+.ph-name-alt{font-size:.72rem;color:var(--muted);font-family:'Noto Serif Ethiopic',serif;margin-top:1px}
+.ph-date-row{display:flex;justify-content:space-between;gap:8px;font-size:.72rem;color:var(--muted);margin-top:4px;flex-wrap:wrap}
+.ph-greg{color:var(--pri);font-weight:600}
+.h-photo-btn{background:none;border:1.5px solid var(--border);border-radius:var(--rad-s);padding:3px 9px;font-size:.7rem;color:var(--muted);cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.h-photo-btn:hover{border-color:var(--pri);color:var(--pri)}
+.dn-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.dn-table th{background:var(--pri);color:#fff;padding:6px 8px;text-align:left;font-size:.74rem}
+.dn-table td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top}
+.dn-table tr:nth-child(even) td{background:var(--bg)}
+.dn-table .dn-day{font-weight:800;color:var(--pri)}
+.dn-table .dn-eth{font-family:'Noto Serif Ethiopic',serif}
+.h-photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px;margin-bottom:10px}
+.h-photo-item{position:relative;aspect-ratio:1}
+.h-photo-item img{width:100%;height:100%;object-fit:cover;border-radius:6px;border:1.5px solid var(--border)}
+.h-photo-del{position:absolute;top:2px;right:2px;background:var(--danger);color:#fff;border:none;border-radius:50%;width:16px;height:16px;font-size:.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* ═══ PROFILE PAGE ═══ */
+.profile-cover-wrap{position:relative;margin-bottom:56px}
+.profile-cover{height:150px;border-radius:var(--rad) var(--rad) 0 0;background:linear-gradient(135deg,var(--pri),var(--acc));position:relative;overflow:hidden}
+.profile-cover img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.cover-edit-btn{position:absolute;bottom:8px;right:10px;background:rgba(0,0,0,.45);color:#fff;border:none;border-radius:var(--rad-s);padding:5px 12px;font-family:var(--font);font-size:.75rem;cursor:pointer;backdrop-filter:blur(4px);display:flex;align-items:center;gap:5px}
+.profile-avatar-area{position:absolute;left:18px;bottom:-48px;display:flex;align-items:flex-end;gap:6px}
+.profile-avatar-ring{width:88px;height:88px;border-radius:50%;border:4px solid var(--card);background:var(--pri);overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}
+.profile-avatar-ring img{width:100%;height:100%;object-fit:cover}
+#profileAvatarInitial{font-size:2.1rem;font-weight:800;color:#fff}
+.avatar-cam-btn{background:var(--pri);color:#fff;border:none;border-radius:50%;width:26px;height:26px;font-size:.72rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.2);position:absolute;bottom:2px;left:64px}
+.profile-section{background:var(--card);border-radius:var(--rad);border:1.5px solid var(--border);padding:14px;margin-bottom:14px;box-shadow:var(--shadow)}
+.ps-title{font-size:.9rem;font-weight:700;color:var(--pri);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.pinfo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+@media(max-width:520px){.pinfo-grid{grid-template-columns:1fr}}
+.pfield{display:flex;flex-direction:column;gap:4px}
+.pfield.full{grid-column:1/-1}
+.pfield label{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase}
+.pinput{width:100%;border:1.5px solid var(--border);border-radius:var(--rad-s);padding:8px 10px;font-family:var(--font);font-size:.84rem;background:var(--bg);color:var(--text);transition:border-color .2s}
+.pinput:focus{outline:none;border-color:var(--pri)}
+.gender-row{display:flex;gap:6px;flex-wrap:wrap}
+.g-btn{flex:1;padding:7px 10px;border:2px solid var(--border);border-radius:var(--rad-s);background:var(--bg);color:var(--muted);font-family:var(--font);font-size:.82rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .2s}
+.g-btn:hover{border-color:var(--pri);color:var(--pri)}
+.g-btn.active-male{background:#1565c0;color:#fff;border-color:#1565c0}
+.g-btn.active-female{background:#e84393;color:#fff;border-color:#e84393}
+.g-btn-clear{flex:0 0 36px;padding:7px 0;font-size:.8rem}
+.g-btn-clear:hover{border-color:var(--danger);color:var(--danger)}
+.prod-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.prod-lbl{font-size:.75rem;font-weight:700;color:var(--muted);width:52px;flex-shrink:0}
+.prod-bar-bg{flex:1;height:11px;background:var(--border);border-radius:6px;overflow:hidden}
+.prod-bar-fill{height:100%;border-radius:6px;width:0%;transition:width .6s ease}
+.prod-row span:last-child{font-size:.75rem;font-weight:700;color:var(--text);width:33px;text-align:right}
+.badges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:12px}
+.badge-card{background:var(--bg);border-radius:var(--rad);padding:12px;text-align:center;border:2px solid var(--border);transition:all .3s}
+.badge-card.unlocked{border-color:var(--pri);background:linear-gradient(135deg,#f0eeff,#e8fff8)}
+.badge-card.locked{opacity:.42;filter:grayscale(1)}
+body.theme-dark .badge-card.unlocked{background:linear-gradient(135deg,#2d2157,#0d3d30)}
+.bc-icon{font-size:2rem;margin-bottom:5px}
+.bc-name{font-size:.75rem;font-weight:700;color:var(--text);margin-bottom:3px}
+.bc-desc{font-size:.65rem;color:var(--muted)}
+.streak-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+.streak-item{display:flex;align-items:center;gap:6px;background:var(--bg);padding:6px 12px;border-radius:20px;font-size:.8rem;font-weight:600;color:var(--text);border:1px solid var(--border)}
+.streak-item i{color:var(--warn)}
+.reward-form-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
+.reward-form-row .pinput{flex:1;min-width:110px;padding:6px 9px;font-size:.8rem}
+.reward-item{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:var(--rad-s);padding:7px 10px;border:1px solid var(--border);font-size:.82rem;margin-bottom:5px}
+.ri-goal{flex:1;font-weight:600}
+.ri-reward{color:var(--acc);font-weight:700}
+.ri-del{background:none;border:none;color:var(--danger);cursor:pointer;font-size:.82rem}
+
+/* ═══ SETTINGS PAGE ═══ */
+.settings-group{background:var(--card);border-radius:var(--rad);margin-bottom:14px;border:1.5px solid var(--border);overflow:hidden;box-shadow:var(--shadow)}
+.sg-title{padding:11px 14px;font-size:.75rem;font-weight:800;color:var(--pri);background:var(--bg);border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.7px;display:flex;align-items:center;gap:7px}
+.s-item{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);font-size:.85rem;color:var(--text)}
+.s-item:last-child{border-bottom:none}
+.s-item span{display:flex;align-items:center;gap:8px}
+.s-item span i{color:var(--pri);width:16px;text-align:center}
+.s-item.clickable{cursor:pointer;transition:background .15s}
+.s-item.clickable:hover{background:var(--bg)}
+.s-action-btn{background:var(--pri-l);color:#fff;border:none;border-radius:var(--rad-s);padding:5px 13px;font-family:var(--font);font-size:.78rem;cursor:pointer;transition:background .2s}
+.s-action-btn:hover{background:var(--pri)}
+.s-select{border:1.5px solid var(--border);border-radius:var(--rad-s);padding:5px 9px;font-family:var(--font);font-size:.82rem;background:var(--bg);color:var(--text);cursor:pointer}
+.tog-sw{position:relative;display:inline-block;width:42px;height:23px}
+.tog-sw input{opacity:0;width:0;height:0}
+.tog-slider{position:absolute;cursor:pointer;inset:0;background:var(--border);border-radius:23px;transition:.3s}
+.tog-slider::before{content:'';position:absolute;width:17px;height:17px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+input:checked+.tog-slider{background:var(--pri)}
+input:checked+.tog-slider::before{transform:translateX(19px)}
+.social-row{display:flex;flex-wrap:wrap;gap:8px;padding:12px 14px}
+.soc-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:.8rem;font-weight:600;text-decoration:none;cursor:pointer;transition:transform .2s;color:#fff}
+.soc-btn:hover{transform:scale(1.05)}
+.soc-btn.instagram{background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#bc1888)}
+.soc-btn.facebook{background:#1877f2}
+.soc-btn.linkedin{background:#0a66c2}
+.soc-btn.tiktok{background:#000}
+.settings-version{text-align:center;padding:20px;color:var(--muted);font-size:.76rem;line-height:2}
+
+/* ═══ MODALS ═══ */
+.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.52);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:14px}
+.modal-box{background:var(--card);border-radius:var(--rad);width:100%;max-width:460px;max-height:90vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.25);display:flex;flex-direction:column}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:linear-gradient(135deg,var(--pri),var(--acc));color:#fff;border-radius:var(--rad) var(--rad) 0 0}
+.modal-hdr h3{font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:7px}
+.modal-close{background:none;border:none;color:#fff;cursor:pointer;font-size:1rem;padding:4px;border-radius:50%;transition:background .2s}
+.modal-close:hover{background:rgba(255,255,255,.2)}
+.modal-body{padding:16px 18px;display:flex;flex-direction:column;gap:12px;flex:1}
+.mfield{display:flex;flex-direction:column;gap:4px}
+.mfield label{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase}
+.mfield-inline{flex-direction:row;align-items:center;justify-content:space-between}
+.minput{border:1.5px solid var(--border);border-radius:var(--rad-s);padding:8px 10px;font-family:var(--font);font-size:.85rem;background:var(--bg);color:var(--text);width:100%}
+.minput:focus{outline:none;border-color:var(--pri)}
+.sticker-row{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.sticker-opt{font-size:1.45rem;cursor:pointer;padding:3px;border-radius:7px;border:2px solid transparent;transition:all .15s;user-select:none}
+.sticker-opt:hover,.sticker-opt.selected{border-color:var(--pri);background:var(--bg);transform:scale(1.2)}
+.day-check-row{display:flex;flex-wrap:wrap;gap:8px}
+.day-check-row label{display:flex;align-items:center;gap:3px;font-size:.78rem;cursor:pointer}
+.day-check-row input{accent-color:var(--pri)}
+.modal-footer{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+
+/* ═══ SHARED BUTTONS ═══ */
+.save-btn{background:var(--pri);color:#fff;border:none;border-radius:var(--rad-s);padding:9px 20px;font-family:var(--font);font-size:.85rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .2s,transform .1s}
+.save-btn:hover{background:var(--pri-d);transform:scale(1.02)}
+.save-btn.small{padding:6px 12px;font-size:.78rem}
+.cancel-btn{background:var(--border);color:var(--text);border:none;border-radius:var(--rad-s);padding:9px 20px;font-family:var(--font);font-size:.85rem;cursor:pointer;transition:background .2s}
+.cancel-btn:hover{background:var(--muted);color:#fff}
+
+/* ═══ CHATBOT ═══ */
+.chatbot-fab{position:fixed;bottom:76px;right:16px;z-index:200;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--pri),var(--acc));color:#fff;border:none;font-size:1.35rem;cursor:pointer;box-shadow:0 4px 16px rgba(108,99,255,.35);display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.chatbot-fab:hover{transform:scale(1.1)}
+.chatbot-modal{position:fixed;bottom:140px;right:12px;z-index:200;width:310px;max-height:420px;background:var(--card);border-radius:var(--rad);box-shadow:0 8px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;overflow:hidden;border:1.5px solid var(--border)}
+.chatbot-hdr{background:linear-gradient(135deg,var(--pri),var(--acc));color:#fff;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:.88rem}
+.chatbot-hdr button{background:none;border:none;color:#fff;cursor:pointer;font-size:.95rem}
+.chatbot-msgs{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:7px}
+.bot-msg,.user-msg{padding:7px 11px;border-radius:11px;max-width:86%;font-size:.8rem;line-height:1.45;white-space:pre-wrap}
+.bot-msg{background:var(--bg);color:var(--text);align-self:flex-start}
+.user-msg{background:var(--pri);color:#fff;align-self:flex-end}
+.chatbot-inp{display:flex;border-top:1px solid var(--border);padding:7px}
+.chatbot-inp input{flex:1;border:1.5px solid var(--border);border-radius:20px;padding:6px 11px;font-family:var(--font);font-size:.8rem;background:var(--bg);color:var(--text)}
+.chatbot-inp button{background:var(--pri);color:#fff;border:none;border-radius:50%;width:32px;height:32px;margin-left:5px;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center}
+
+/* ═══ TOAST ═══ */
+.toast-msg{position:fixed;bottom:78px;left:50%;transform:translateX(-50%);background:rgba(45,52,54,.92);color:#fff;padding:9px 22px;border-radius:22px;font-size:.84rem;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;backdrop-filter:blur(4px)}
+.toast-msg.show{opacity:1}
+
+/* ═══ SCROLLBAR ═══ */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--pri-l)}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:480px){
+  .pages-container{padding:10px 8px}
+  .chatbot-modal{width:calc(100vw - 20px);right:10px}
+  .pt-prediction-row{grid-template-columns:1fr 1fr}
+  .pinfo-grid{grid-template-columns:1fr}
+}
+
+  </style>
+</head>
+<body class="theme-light" id="appBody">
+<div id="app">
+
+  <!-- TOP BAR -->
+  <header class="top-bar" id="topBar">
+    <div class="app-logo">
+      <span>🇪🇹</span>
+      <span class="logo-text">Ethio Planner</span>
+    </div>
+    <div class="top-bar-right">
+      <button class="icon-btn" id="themeToggleBtn" title="Toggle Theme"><i class="fas fa-moon"></i></button>
+      <button class="icon-btn" title="Notifications"><i class="fas fa-bell"></i><span class="badge" id="notifBadge" style="display:none">0</span></button>
+      <div class="avatar-mini" id="topAvatar" onclick="navigate('profile')">
+        <img src="" id="topAvatarImg" alt="" onerror="this.style.display='none'"/>
+        <span id="topAvatarInitial">U</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="pages-container" id="pagesContainer">
+
+    <!-- ══════════════════════════════════════
+         PAGE 1 — HOME
+    ══════════════════════════════════════ -->
+    <div class="page active" id="page-home">
+
+      <!-- ── SECTION 1: SCHEDULER & REMINDER ── -->
+      <div class="home-section-card" id="sec-scheduler">
+        <div class="hsc-header" onclick="toggleSection('scheduler')">
+          <span class="hsc-icon">📅</span>
+          <span class="hsc-title">Scheduler &amp; Reminder</span>
+          <i class="fas fa-chevron-down hsc-arrow" id="arrow-scheduler"></i>
+        </div>
+        <div class="hsc-body" id="body-scheduler">
+          <!-- Calendar type bar -->
+          <div class="cal-type-row">
+            <button class="cal-type-btn active" id="sched-eth-btn" onclick="schedSwitchCalType('eth')">🇪🇹 Ethiopian</button>
+            <button class="cal-type-btn" id="sched-greg-btn" onclick="schedSwitchCalType('greg')">🌍 Gregorian</button>
+          </div>
+          <!-- Today label -->
+          <div class="today-label-bar" id="todayLabelBar"></div>
+          <!-- View tabs -->
+          <div class="view-tabs">
+            <button class="vtab active" data-sv="day" onclick="switchSchedView('day')">Day List</button>
+            <button class="vtab" data-sv="week" onclick="switchSchedView('week')">Weekly</button>
+            <button class="vtab" data-sv="month" onclick="switchSchedView('month')">Monthly</button>
+          </div>
+          <!-- Direct date jump -->
+          <div class="date-jump-row">
+            <label class="dj-label">Go to date:</label>
+            <input type="date" id="dateJumpInput" class="dj-input" onchange="jumpToDate(this.value)"/>
+          </div>
+
+          <!-- DAY VIEW -->
+          <div class="sv active" id="sv-day">
+            <div class="cal-nav-row">
+              <button class="nav-arrow" onclick="changeSchedDay(-1)"><i class="fas fa-chevron-left"></i></button>
+              <h3 class="cal-nav-title" id="svDayTitle"></h3>
+              <button class="nav-arrow" onclick="changeSchedDay(1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div id="svDayEvents" class="day-events-area"></div>
+            <button class="add-fab" onclick="openEntryModal(null)"><i class="fas fa-plus"></i> Add Entry</button>
+          </div>
+
+          <!-- WEEK VIEW -->
+          <div class="sv" id="sv-week">
+            <div class="cal-nav-row">
+              <button class="nav-arrow" onclick="changeSchedWeek(-1)"><i class="fas fa-chevron-left"></i></button>
+              <h3 class="cal-nav-title" id="svWeekTitle"></h3>
+              <button class="nav-arrow" onclick="changeSchedWeek(1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="week-grid-wrap" id="svWeekGrid"></div>
+          </div>
+
+          <!-- MONTH VIEW -->
+          <div class="sv" id="sv-month">
+            <div class="cal-nav-row">
+              <button class="nav-arrow" onclick="changeSchedMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+              <h3 class="cal-nav-title" id="svMonthTitle"></h3>
+              <button class="nav-arrow" onclick="changeSchedMonth(1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="month-grid-wrap" id="svMonthGrid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 2: PLANNER DESIGNER ── -->
+      <div class="home-section-card" id="sec-planner">
+        <div class="hsc-header" onclick="toggleSection('planner')">
+          <span class="hsc-icon">📋</span>
+          <span class="hsc-title">Planner Designer</span>
+          <i class="fas fa-chevron-down hsc-arrow" id="arrow-planner"></i>
+        </div>
+        <div class="hsc-body collapsed" id="body-planner">
+          <div class="view-tabs">
+            <button class="vtab active" data-pv="daily" onclick="switchPlannerView('daily')">Daily</button>
+            <button class="vtab" data-pv="weekly" onclick="switchPlannerView('weekly')">Weekly</button>
+            <button class="vtab" data-pv="monthly" onclick="switchPlannerView('monthly')">Monthly</button>
+            <button class="vtab" data-pv="myfiles" onclick="switchPlannerView('myfiles')">My Files</button>
+          </div>
+
+          <!-- DAILY PLANNER -->
+          <div class="pv active" id="pv-daily">
+            <div class="planner-date-bar">
+              <span id="pDailyDateLabel"></span>
+              <input type="date" id="pDailyDatePicker" class="dj-input" onchange="changeDailyPlannerDate(this.value)"/>
+            </div>
+            <!-- Sequence: Goals → Schedule → To Do → For Tomorrow → Notes -->
+            <div class="planner-block">
+              <div class="pb-title"><i class="fas fa-bullseye"></i> Goals for the Day</div>
+              <div id="dp-goals" class="pb-list"></div>
+              <button class="pb-add-btn" onclick="pbAdd('dp-goals','goal')"><i class="fas fa-plus"></i> Add Goal</button>
+            </div>
+            <div class="planner-block">
+              <div class="pb-title"><i class="fas fa-clock"></i> Schedule for Today</div>
+              <div class="schedule-scroll" id="dp-schedule"></div>
+            </div>
+            <div class="planner-block">
+              <div class="pb-title"><i class="fas fa-check-square"></i> To Do List</div>
+              <div id="dp-todo" class="pb-list"></div>
+              <button class="pb-add-btn" onclick="pbAdd('dp-todo','todo')"><i class="fas fa-plus"></i> Add Task</button>
+            </div>
+            <div class="planner-block">
+              <div class="pb-title"><i class="fas fa-arrow-right"></i> For Tomorrow</div>
+              <div id="dp-tomorrow" class="pb-list"></div>
+              <button class="pb-add-btn" onclick="pbAdd('dp-tomorrow','tomorrow')"><i class="fas fa-plus"></i> Add Item</button>
+            </div>
+            <div class="planner-block">
+              <div class="pb-title"><i class="fas fa-sticky-note"></i> Notes</div>
+              <textarea class="pb-notes" id="dp-notes" placeholder="Your notes for today..." oninput="savePlannerAuto()"></textarea>
+            </div>
+            <div class="planner-save-row">
+              <button class="save-btn" onclick="saveDailyPlanner()"><i class="fas fa-save"></i> Save Plan</button>
+            </div>
+          </div>
+
+          <!-- WEEKLY PLANNER -->
+          <div class="pv" id="pv-weekly">
+            <div class="planner-date-bar">
+              <span id="pWeeklyLabel"></span>
+            </div>
+            <!-- Sequence: Weekly Goals → Priorities → Schedule → To-Do -->
+            <div class="planner-block">
+              <div class="pb-title"><i class="fas fa-crosshairs"></i> Weekly Goals</div>
+              <div id="wp-goals" class="pb-list"></div>
+              <button class="pb-add-btn" onclick="pbAdd('wp-goals','goal')"><i class="fas fa-plus"></i> Add Goal</button>
+            </div>
+            <div class="planner-block">
+              <div class="pb-title"><i class="fas fa-heart"></i> Priorities This Week</div>
+              <div id="wp-priorities" class="pb-list"></div>
+              <button class="pb-add-btn" onclick="pbAdd('wp-priorities','priority')"><i class="fas fa-plus"></i> Add Priority</button>
+            </div>
+            <div class="planner-block">
+              <div class="pb-title"><i class="fas fa-table"></i> Weekly Schedule</div>
+              <div class="schedule-scroll" id="wp-schedule-wrap"></div>
+            </div>
+            <div class="planner-block">
+              <div class="pb-title"><i class="fas fa-tasks"></i> To-Do List</div>
+              <div id="wp-todo" class="pb-list"></div>
+              <button class="pb-add-btn" onclick="pbAdd('wp-todo','todo')"><i class="fas fa-plus"></i> Add Task</button>
+            </div>
+            <div class="planner-save-row">
+              <button class="save-btn" onclick="saveWeeklyPlanner()"><i class="fas fa-save"></i> Save Plan</button>
+            </div>
+          </div>
+
+          <!-- MONTHLY PLANNER -->
+          <div class="pv" id="pv-monthly">
+            <div class="planner-date-bar">
+              <span id="pMonthlyLabel"></span>
+              <div class="cal-nav-inline">
+                <button class="nav-arrow" onclick="changeMonthlyPlan(-1)"><i class="fas fa-chevron-left"></i></button>
+                <button class="nav-arrow" onclick="changeMonthlyPlan(1)"><i class="fas fa-chevron-right"></i></button>
+              </div>
+            </div>
+            <div class="planner-block">
+              <div class="pb-title"><i class="fas fa-calendar"></i> Monthly Calendar Grid</div>
+              <div id="mp-cal-grid" class="mp-grid-wrap"></div>
+            </div>
+            <div class="planner-save-row">
+              <button class="save-btn" onclick="saveMonthlyPlanner()"><i class="fas fa-save"></i> Save Plan</button>
+            </div>
+          </div>
+
+          <!-- MY FILES -->
+          <div class="pv" id="pv-myfiles">
+            <div class="myfiles-header">
+              <h4><i class="fas fa-folder-open"></i> My Saved Plans</h4>
+              <span class="mf-hint">Tap 📌 to pin a plan to top</span>
+            </div>
+            <div id="myfiles-list" class="myfiles-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 3: SPECIAL DAY REMINDER ── -->
+      <div class="home-section-card" id="sec-special">
+        <div class="hsc-header" onclick="toggleSection('special')">
+          <span class="hsc-icon">🌸</span>
+          <span class="hsc-title">Special Day Reminder</span>
+          <i class="fas fa-chevron-down hsc-arrow" id="arrow-special"></i>
+        </div>
+        <div class="hsc-body collapsed" id="body-special">
+          <div class="period-tracker-wrap">
+            <!-- Input row -->
+            <div class="pt-input-card">
+              <div class="pt-input-title"><i class="fas fa-calendar-plus"></i> Log Your Cycle</div>
+              <div class="pt-input-row">
+                <div class="pt-field">
+                  <label>Cycle Start Date</label>
+                  <input type="date" id="ptStartDate" class="pt-input"/>
+                </div>
+                <div class="pt-field">
+                  <label>Cycle End Date</label>
+                  <input type="date" id="ptEndDate" class="pt-input"/>
+                </div>
+                <div class="pt-field">
+                  <label>Avg Cycle Length</label>
+                  <input type="number" id="ptCycleLen" class="pt-input" value="28" min="20" max="40"/>
+                </div>
+              </div>
+              <button class="save-btn" onclick="logCycle()"><i class="fas fa-save"></i> Log &amp; Calculate</button>
+            </div>
+
+            <!-- Prediction cards -->
+            <div class="pt-prediction-row" id="ptPredictionRow" style="display:none">
+              <div class="pt-pred-card green">
+                <div class="pt-pred-emoji">🩸</div>
+                <div class="pt-pred-label">Flow Duration</div>
+                <div class="pt-pred-val" id="ptFlowDur">—</div>
+              </div>
+              <div class="pt-pred-card blue">
+                <div class="pt-pred-emoji">📅</div>
+                <div class="pt-pred-label">Next Cycle Expected</div>
+                <div class="pt-pred-val" id="ptNextDate">—</div>
+              </div>
+              <div class="pt-pred-card pink">
+                <div class="pt-pred-emoji">⚠️</div>
+                <div class="pt-pred-label">1-Day Reminder</div>
+                <div class="pt-pred-val" id="ptAlertDate">—</div>
+              </div>
+              <div class="pt-pred-card purple">
+                <div class="pt-pred-emoji">🥚</div>
+                <div class="pt-pred-label">Ovulation Window</div>
+                <div class="pt-pred-val" id="ptOvulDate">—</div>
+              </div>
+            </div>
+
+            <!-- Annual tracker grid (like the image) -->
+            <div class="pt-tracker-section">
+              <div class="pt-tracker-header">
+                <span class="pt-tracker-title">🩷 Period Tracker</span>
+                <span class="pt-year-label" id="ptYearLabel"></span>
+              </div>
+              <div class="pt-grid-scroll">
+                <table class="pt-tracker-table" id="ptTrackerTable"></table>
+              </div>
+              <!-- Legend -->
+              <div class="pt-legend">
+                <div class="pt-legend-row">
+                  <div class="pt-leg-item"><span class="pt-leg-dot flow-light"></span>Light Flow</div>
+                  <div class="pt-leg-item"><span class="pt-leg-dot flow-medium"></span>Medium Flow</div>
+                  <div class="pt-leg-item"><span class="pt-leg-dot flow-heavy"></span>Heavy Flow</div>
+                  <div class="pt-leg-item"><span class="pt-leg-dot flow-ovulation"></span>Ovulation</div>
+                </div>
+                <div class="pt-legend-row">
+                  <div class="pt-leg-item"><span class="pt-pain-icon">⚡</span>Light Pain</div>
+                  <div class="pt-leg-item"><span class="pt-pain-icon">⚡⚡</span>Medium Pain</div>
+                  <div class="pt-leg-item"><span class="pt-pain-icon">⚡⚡⚡</span>High Pain</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cycle Length table -->
+            <div class="pt-cycle-length-section">
+              <div class="pt-tracker-title" style="margin-bottom:8px"><i class="fas fa-chart-bar"></i> Cycle Length by Month</div>
+              <table class="pt-cycle-len-table" id="ptCycleLenTable"></table>
+            </div>
+
+            <!-- Notes per month -->
+            <div class="pt-notes-section">
+              <div class="pt-tracker-title"><i class="fas fa-sticky-note"></i> Monthly Notes</div>
+              <table class="pt-notes-table" id="ptNotesTable"></table>
+            </div>
+
+            <!-- History -->
+            <div class="pt-history-section">
+              <div class="pt-tracker-title"><i class="fas fa-history"></i> Cycle History</div>
+              <div id="ptHistoryList" class="pt-history-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- end page-home -->
+
+    <!-- ══════════════════════════════════════
+         PAGE 2 — CALENDAR
+    ══════════════════════════════════════ -->
+    <div class="page" id="page-calendar">
+      <div class="page-title-bar"><h2><i class="fas fa-calendar"></i> Calendar</h2></div>
+
+      <!-- Dual calendar toggle -->
+      <div class="cal-toggle-bar">
+        <button class="cal-toggle-btn active" id="calBtn-eth" onclick="calSwitchType('eth')">🇪🇹 Ethiopian</button>
+        <button class="cal-toggle-btn" id="calBtn-greg" onclick="calSwitchType('greg')">🌍 Gregorian</button>
+        <button class="cal-toggle-btn" id="calBtn-both" onclick="calSwitchType('both')">Both</button>
+      </div>
+
+      <div class="cal-panels-row" id="calPanelsRow">
+        <!-- Ethiopian panel -->
+        <div class="cal-full-panel" id="calPanel-eth">
+          <div class="cfp-nav">
+            <button class="nav-arrow" onclick="calNavMonth('eth',-1)"><i class="fas fa-chevron-left"></i></button>
+            <h3 id="calTitle-eth">Ethiopian Calendar</h3>
+            <button class="nav-arrow" onclick="calNavMonth('eth',1)"><i class="fas fa-chevron-right"></i></button>
+          </div>
+          <div class="cfp-grid" id="calGrid-eth"></div>
+        </div>
+        <!-- Gregorian panel -->
+        <div class="cal-full-panel" id="calPanel-greg">
+          <div class="cfp-nav">
+            <button class="nav-arrow" onclick="calNavMonth('greg',-1)"><i class="fas fa-chevron-left"></i></button>
+            <h3 id="calTitle-greg">Gregorian Calendar</h3>
+            <button class="nav-arrow" onclick="calNavMonth('greg',1)"><i class="fas fa-chevron-right"></i></button>
+          </div>
+          <div class="cfp-grid" id="calGrid-greg"></div>
+        </div>
+      </div>
+
+      <!-- Date Converter -->
+      <div class="converter-section">
+        <div class="page-title-bar"><h2><i class="fas fa-exchange-alt"></i> Date Converter</h2></div>
+        <div class="conv-block">
+          <div class="conv-title">🇪🇹 Ethiopian → 🌍 Gregorian</div>
+          <div class="conv-row">
+            <select id="convEthMonth" class="minput"></select>
+            <input type="number" id="convEthDay" class="minput conv-num" placeholder="Day" min="1" max="30"/>
+            <input type="number" id="convEthYear" class="minput conv-num" placeholder="Year"/>
+            <button class="save-btn" onclick="convertEthToGreg()"><i class="fas fa-arrow-right"></i></button>
+          </div>
+          <div class="conv-result" id="convEthResult"></div>
+        </div>
+        <div class="conv-block">
+          <div class="conv-title">🌍 Gregorian → 🇪🇹 Ethiopian</div>
+          <div class="conv-row">
+            <input type="date" id="convGregDate" class="minput" style="flex:1"/>
+            <button class="save-btn" onclick="convertGregToEth()"><i class="fas fa-arrow-right"></i></button>
+          </div>
+          <div class="conv-result" id="convGregResult"></div>
+        </div>
+      </div>
+
+      <!-- Holidays section -->
+      <div class="holidays-section">
+        <div class="page-title-bar"><h2><i class="fas fa-star"></i> Holidays &amp; Observances</h2></div>
+        <div class="holiday-tabs">
+          <button class="htab active" data-ht="public" onclick="switchHTab('public')">Public</button>
+          <button class="htab" data-ht="orthodox" onclick="switchHTab('orthodox')">Orthodox</button>
+          <button class="htab" data-ht="muslim" onclick="switchHTab('muslim')">Muslim</button>
+          <button class="htab" data-ht="daynames" onclick="switchHTab('daynames')">Day Names</button>
+          <button class="htab" data-ht="yearly" onclick="switchHTab('yearly')">Yearly Feasts</button>
+        </div>
+        <div class="hview active" id="hv-public"><div id="hlist-public" class="h-list"></div></div>
+        <div class="hview" id="hv-orthodox"><div id="hlist-orthodox" class="h-list"></div></div>
+        <div class="hview" id="hv-muslim"><div id="hlist-muslim" class="h-list"></div></div>
+        <div class="hview" id="hv-daynames"><div id="hlist-daynames" class="h-list"></div></div>
+        <div class="hview" id="hv-yearly"><div id="hlist-yearly" class="h-list"></div></div>
+      </div>
+    </div><!-- end page-calendar -->
+
+    <!-- ══════════════════════════════════════
+         PAGE 3 — MINE (MY PROFILE)
+    ══════════════════════════════════════ -->
+    <div class="page" id="page-profile">
+      <div class="profile-cover-wrap">
+        <div class="profile-cover" id="profileCoverBg">
+          <input type="file" id="coverUpload" accept="image/*" style="display:none" onchange="uploadCover(this)"/>
+          <button class="cover-edit-btn" onclick="document.getElementById('coverUpload').click()"><i class="fas fa-camera"></i></button>
+        </div>
+        <div class="profile-avatar-area">
+          <div class="profile-avatar-ring">
+            <img src="" id="profileAvatarImg" alt="" style="display:none"/>
+            <span id="profileAvatarInitial">U</span>
+          </div>
+          <input type="file" id="avatarUpload" accept="image/*" style="display:none" onchange="uploadAvatar(this)"/>
+          <button class="avatar-cam-btn" onclick="document.getElementById('avatarUpload').click()"><i class="fas fa-camera"></i></button>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <div class="ps-title"><i class="fas fa-user"></i> Profile Information</div>
+        <div class="pinfo-grid">
+          <div class="pfield"><label>Full Name</label><input type="text" id="pfName" class="pinput" placeholder="Your full name" oninput="saveProfile()"/></div>
+          <div class="pfield"><label>Username</label><input type="text" id="pfUsername" class="pinput" placeholder="@username" oninput="saveProfile()"/></div>
+          <div class="pfield full"><label>Bio</label><textarea id="pfBio" class="pinput" rows="2" placeholder="About you..." oninput="saveProfile()"></textarea></div>
+          <div class="pfield"><label>Phone</label><input type="tel" id="pfPhone" class="pinput" placeholder="+251..." oninput="saveProfile()"/></div>
+          <div class="pfield"><label>Date of Birth</label><input type="date" id="pfDob" class="pinput" oninput="saveProfile()"/></div>
+          <div class="pfield">
+            <label>Gender <span style="font-size:0.72rem;color:var(--text-muted)">(optional)</span></label>
+            <div class="gender-row">
+              <button class="g-btn" id="gBtn-male" onclick="setGender('male')"><i class="fas fa-mars"></i> Male</button>
+              <button class="g-btn" id="gBtn-female" onclick="setGender('female')"><i class="fas fa-venus"></i> Female</button>
+              <button class="g-btn g-btn-clear" onclick="clearGender()" title="Clear gender"><i class="fas fa-times"></i></button>
+            </div>
+          </div>
+          <div class="pfield"><label>Language</label>
+            <select id="pfLanguage" class="pinput" onchange="setLanguage(this.value)">
+              <option value="en">English</option><option value="am">Amharic</option>
+              <option value="or">Afaan Oromo</option><option value="ti">Tigrinya</option>
+            </select>
+          </div>
+        </div>
+        <button class="save-btn" onclick="saveProfile();showToast('Profile saved!')"><i class="fas fa-save"></i> Save Profile</button>
+      </div>
+
+      <div class="profile-section">
+        <div class="ps-title"><i class="fas fa-chart-bar"></i> Productivity Score</div>
+        <div class="prod-row"><span class="prod-lbl">Daily</span><div class="prod-bar-bg"><div class="prod-bar-fill" id="prodDaily" style="background:#6c63ff"></div></div><span id="prodDailyPct">0%</span></div>
+        <div class="prod-row"><span class="prod-lbl">Weekly</span><div class="prod-bar-bg"><div class="prod-bar-fill" id="prodWeekly" style="background:#00c8a0"></div></div><span id="prodWeeklyPct">0%</span></div>
+        <div class="prod-row"><span class="prod-lbl">Monthly</span><div class="prod-bar-bg"><div class="prod-bar-fill" id="prodMonthly" style="background:#f5a623"></div></div><span id="prodMonthlyPct">0%</span></div>
+        <div class="prod-row"><span class="prod-lbl">Overall</span><div class="prod-bar-bg"><div class="prod-bar-fill" id="prodOverall" style="background:#e94b77"></div></div><span id="prodOverallPct">0%</span></div>
+      </div>
+
+      <div class="profile-section">
+        <div class="ps-title"><i class="fas fa-trophy"></i> Achievements</div>
+        <div class="badges-grid">
+          <div class="badge-card locked" id="badge-bronze"><div class="bc-icon">🥉</div><div class="bc-name">Bronze Planner</div><div class="bc-desc">5 days streak</div></div>
+          <div class="badge-card locked" id="badge-silver"><div class="bc-icon">🥈</div><div class="bc-name">Silver Planner</div><div class="bc-desc">20 days streak</div></div>
+          <div class="badge-card locked" id="badge-gold"><div class="bc-icon">🥇</div><div class="bc-name">Gold Planner</div><div class="bc-desc">50 days streak</div></div>
+          <div class="badge-card locked" id="badge-master"><div class="bc-icon">🏆</div><div class="bc-name">Productivity Master</div><div class="bc-desc">90% score</div></div>
+          <div class="badge-card locked" id="badge-star"><div class="bc-icon">⭐</div><div class="bc-name">Study Champion</div><div class="bc-desc">7 day goals streak</div></div>
+        </div>
+        <div class="streak-row">
+          <div class="streak-item"><i class="fas fa-fire"></i> <b id="loginStreakCount">0</b> day login streak</div>
+          <div class="streak-item"><i class="fas fa-calendar-check"></i> <b id="planningStreakCount">0</b> planning streak</div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <div class="ps-title"><i class="fas fa-gift"></i> Personal Rewards</div>
+        <div class="reward-form-row">
+          <input type="text" id="rewardGoal" class="pinput" placeholder="Goal name..."/>
+          <input type="text" id="rewardName" class="pinput" placeholder="Reward name..."/>
+          <button class="save-btn small" onclick="addCustomReward()"><i class="fas fa-plus"></i></button>
+        </div>
+        <div id="rewardsList"></div>
+      </div>
+    </div><!-- end page-profile -->
+
+    <!-- ══════════════════════════════════════
+         PAGE 4 — SETTINGS
+    ══════════════════════════════════════ -->
+    <div class="page" id="page-settings">
+      <div class="page-title-bar"><h2><i class="fas fa-cog"></i> Settings</h2></div>
+
+      <div class="settings-group"><div class="sg-title"><i class="fas fa-shield-alt"></i> Security</div>
+        <div class="s-item"><span><i class="fas fa-lock"></i> Password Lock</span><button class="s-action-btn" onclick="openPasswordModal()">Setup</button></div>
+        <div class="s-item"><span><i class="fas fa-th"></i> Pattern Lock</span><button class="s-action-btn" onclick="showToast('Pattern lock — coming soon')">Setup</button></div>
+        <div class="s-item"><span><i class="fas fa-fingerprint"></i> Fingerprint</span><label class="tog-sw"><input type="checkbox" id="setFingerprint" onchange="saveSetting('fingerprint',this.checked)"/><span class="tog-slider"></span></label></div>
+        <div class="s-item"><span><i class="fas fa-smile"></i> Face Recognition</span><label class="tog-sw"><input type="checkbox" id="setFaceId" onchange="saveSetting('faceId',this.checked)"/><span class="tog-slider"></span></label></div>
+      </div>
+
+      <div class="settings-group"><div class="sg-title"><i class="fas fa-language"></i> Language</div>
+        <div class="s-item"><span>App Language</span><select class="s-select" id="settingLanguage" onchange="setLanguage(this.value)"><option value="en">English</option><option value="am">Amharic</option><option value="or">Afaan Oromo</option><option value="ti">Tigrinya</option></select></div>
+      </div>
+
+      <div class="settings-group"><div class="sg-title"><i class="fas fa-palette"></i> Theme</div>
+        <div class="s-item"><span>App Theme</span><select class="s-select" id="settingTheme" onchange="setTheme(this.value)"><option value="light">Light</option><option value="dark">Dark</option><option value="system">System Default</option></select></div>
+      </div>
+
+      <div class="settings-group"><div class="sg-title"><i class="fas fa-calendar-alt"></i> Calendar Preferences</div>
+        <div class="s-item"><span>Primary Calendar</span><select class="s-select" id="settingPrimaryCal" onchange="saveSetting('primaryCal',this.value)"><option value="eth">Ethiopian</option><option value="greg">Gregorian</option></select></div>
+        <div class="s-item"><span>Public Holidays</span><label class="tog-sw"><input type="checkbox" id="setPubH" checked onchange="saveSetting('pubH',this.checked)"/><span class="tog-slider"></span></label></div>
+        <div class="s-item"><span>Orthodox Holidays</span><label class="tog-sw"><input type="checkbox" id="setOrtH" checked onchange="saveSetting('ortH',this.checked)"/><span class="tog-slider"></span></label></div>
+        <div class="s-item"><span>Muslim Holidays</span><label class="tog-sw"><input type="checkbox" id="setMusH" checked onchange="saveSetting('musH',this.checked)"/><span class="tog-slider"></span></label></div>
+        <div class="s-item"><span>Holiday Notifications</span><label class="tog-sw"><input type="checkbox" id="setHNotif" checked onchange="saveSetting('hNotif',this.checked)"/><span class="tog-slider"></span></label></div>
+      </div>
+
+      <div class="settings-group"><div class="sg-title"><i class="fas fa-bell"></i> Alarm Sound</div>
+        <div class="s-item">
+          <span>Default Sound</span>
+          <div style="display:flex;gap:6px;align-items:center">
+            <select class="s-select" id="settingDefaultAlarmSound" onchange="saveDefaultAlarmSound(this.value)"></select>
+            <button type="button" class="preview-btn" onclick="previewDefaultAlarmSound()">▶</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-group"><div class="sg-title"><i class="fas fa-tools"></i> Data &amp; App</div>
+        <div class="s-item clickable" onclick="backupData()"><span><i class="fas fa-download"></i> Backup &amp; Restore</span><i class="fas fa-chevron-right"></i></div>
+        <div class="s-item clickable" onclick="exportData()"><span><i class="fas fa-file-export"></i> Export Data (CSV)</span><i class="fas fa-chevron-right"></i></div>
+        <div class="s-item"><span><i class="fas fa-cloud"></i> Cloud Sync</span><label class="tog-sw"><input type="checkbox" id="setCloud" onchange="saveSetting('cloud',this.checked)"/><span class="tog-slider"></span></label></div>
+        <div class="s-item clickable" onclick="shareApp()"><span><i class="fas fa-share-alt"></i> Share App</span><i class="fas fa-chevron-right"></i></div>
+        <div class="s-item clickable" onclick="showToast('Thank you for rating Ethio Planner! ⭐⭐⭐⭐⭐')"><span><i class="fas fa-star"></i> Rate App</span><i class="fas fa-chevron-right"></i></div>
+        <div class="s-item clickable" onclick="window.open('mailto:support@ethioplanner.app','_blank')"><span><i class="fas fa-envelope"></i> Contact Us</span><i class="fas fa-chevron-right"></i></div>
+      </div>
+
+      <div class="settings-group"><div class="sg-title"><i class="fas fa-hashtag"></i> Follow Us</div>
+        <div class="social-row">
+          <a class="soc-btn instagram" onclick="window.open('https://instagram.com','_blank')"><i class="fab fa-instagram"></i> Instagram</a>
+          <a class="soc-btn facebook" onclick="window.open('https://facebook.com','_blank')"><i class="fab fa-facebook"></i> Facebook</a>
+          <a class="soc-btn linkedin" onclick="window.open('https://linkedin.com','_blank')"><i class="fab fa-linkedin"></i> LinkedIn</a>
+          <a class="soc-btn tiktok" onclick="window.open('https://tiktok.com','_blank')"><i class="fab fa-tiktok"></i> TikTok</a>
+        </div>
+      </div>
+      <div class="settings-version">Ethio Planner v2.0 · Made with ❤️ for Ethiopia</div>
+    </div><!-- end page-settings -->
+
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="bnav-item active" data-page="home" onclick="navigate('home')"><i class="fas fa-home"></i><span>Home</span></button>
+    <button class="bnav-item" data-page="calendar" onclick="navigate('calendar')"><i class="fas fa-calendar"></i><span>Calendar</span></button>
+    <button class="bnav-item" data-page="profile" onclick="navigate('profile')"><i class="fas fa-user"></i><span>Mine</span></button>
+    <button class="bnav-item" data-page="settings" onclick="navigate('settings')"><i class="fas fa-cog"></i><span>Settings</span></button>
+  </nav>
+
+  <!-- AI CHATBOT FAB -->
+  <button class="chatbot-fab" onclick="toggleChatbot()"><i class="fas fa-robot"></i></button>
+  <div class="chatbot-modal" id="chatbotModal" style="display:none">
+    <div class="chatbot-hdr"><span><i class="fas fa-robot"></i> Ethio AI</span><button onclick="toggleChatbot()"><i class="fas fa-times"></i></button></div>
+    <div class="chatbot-msgs" id="chatbotMsgs"><div class="bot-msg">👋 Selam! Ask me about holidays, dates, or how to use the app.</div></div>
+    <div class="chatbot-inp"><input type="text" id="chatbotInput" placeholder="Type a message..." onkeypress="if(event.key==='Enter')sendChat()"/><button onclick="sendChat()"><i class="fas fa-paper-plane"></i></button></div>
+  </div>
+
+  <!-- ENTRY MODAL -->
+  <div class="modal-overlay" id="entryModalOverlay" style="display:none">
+    <div class="modal-box">
+      <div class="modal-hdr"><h3><i class="fas fa-plus-circle"></i> New Entry</h3><button class="modal-close" onclick="closeEntryModal()"><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <div class="mfield"><label>Title</label><input type="text" id="emTitle" class="minput" placeholder="Entry title..."/></div>
+        <div class="mfield"><label>Sticker</label>
+          <div class="sticker-row" id="stickerRow">
+            <span class="sticker-opt" onclick="pickSticker(this,'📝')">📝</span><span class="sticker-opt" onclick="pickSticker(this,'⭐')">⭐</span>
+            <span class="sticker-opt" onclick="pickSticker(this,'❤️')">❤️</span><span class="sticker-opt" onclick="pickSticker(this,'🎯')">🎯</span>
+            <span class="sticker-opt" onclick="pickSticker(this,'📚')">📚</span><span class="sticker-opt" onclick="pickSticker(this,'💪')">💪</span>
+            <span class="sticker-opt" onclick="pickSticker(this,'🎉')">🎉</span><span class="sticker-opt" onclick="pickSticker(this,'🌸')">🌸</span>
+            <span class="sticker-opt" onclick="pickSticker(this,'🔥')">🔥</span><span class="sticker-opt" onclick="pickSticker(this,'✅')">✅</span>
+            <input type="text" id="emStickerCustom" class="minput" style="width:54px" placeholder="✏️"/>
+          </div>
+        </div>
+        <div class="mfield"><label>Date</label><input type="date" id="emDate" class="minput"/></div>
+        <div class="mfield"><label>Reminder Time</label><input type="time" id="emTime" class="minput"/></div>
+        <div class="mfield mfield-inline"><label>Alarm</label><label class="tog-sw"><input type="checkbox" id="emAlarm"/><span class="tog-slider"></span></label></div>
+        <div class="mfield"><label>Repeat</label>
+          <select id="emRepeat" class="minput" onchange="toggleCustomDays()">
+            <option value="never">Never</option><option value="daily">Daily</option>
+            <option value="weekly">Weekly</option><option value="custom">Custom Days</option>
+          </select>
+        </div>
+        <div class="mfield" id="emCustomDaysField" style="display:none">
+          <label>Days</label>
+          <div class="day-check-row">
+            <label><input type="checkbox" name="emd" value="0"/> Sun</label>
+            <label><input type="checkbox" name="emd" value="1"/> Mon</label>
+            <label><input type="checkbox" name="emd" value="2"/> Tue</label>
+            <label><input type="checkbox" name="emd" value="3"/> Wed</label>
+            <label><input type="checkbox" name="emd" value="4"/> Thu</label>
+            <label><input type="checkbox" name="emd" value="5"/> Fri</label>
+            <label><input type="checkbox" name="emd" value="6"/> Sat</label>
+          </div>
+        </div>
+        <div class="mfield"><label>Calendar Type</label>
+          <select id="emCalType" class="minput"><option value="gregorian">Gregorian</option><option value="ethiopian">Ethiopian</option></select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="cancel-btn" onclick="closeEntryModal()">Cancel</button>
+        <button class="save-btn" onclick="saveEntry()"><i class="fas fa-save"></i> Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSWORD MODAL -->
+  <div class="modal-overlay" id="pwModalOverlay" style="display:none">
+    <div class="modal-box" style="max-width:320px">
+      <div class="modal-hdr"><h3><i class="fas fa-lock"></i> Set Password</h3><button class="modal-close" onclick="document.getElementById('pwModalOverlay').style.display='none'"><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <div class="mfield"><label>New Password</label><input type="password" id="pw1" class="minput"/></div>
+        <div class="mfield"><label>Confirm</label><input type="password" id="pw2" class="minput"/></div>
+      </div>
+      <div class="modal-footer"><button class="save-btn" onclick="savePassword()"><i class="fas fa-check"></i> Save</button></div>
+    </div>
+  </div>
+
+  <!-- HOLIDAY PHOTO MODAL -->
+  <div class="modal-overlay" id="hPhotoOverlay" style="display:none">
+    <div class="modal-box">
+      <div class="modal-hdr"><h3 id="hPhotoTitle">Holiday Photos</h3><button class="modal-close" onclick="document.getElementById('hPhotoOverlay').style.display='none'"><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <div class="h-photo-grid" id="hPhotoGrid"></div>
+        <div class="mfield"><label>Add Photo</label><input type="file" id="hPhotoUpload" accept="image/*" multiple onchange="addHolidayPhoto(this)"/></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast-msg" id="toast"></div>
+
+</div><!-- #app -->
+
+<script>
+﻿/* =============================================================
+   ETHIO PLANNER — app.js  (complete single-file JS)
+   Ethiopian Calendar epoch: EC_EPOCH = -716732 (fixed & verified)
+   Wed Jul 1 2026 Gregorian = Wed, Sene 24, 2018 E.C.
+   Thu Sep 11 2025 Gregorian = Thu, Meskerem 1, 2018 E.C. (New Year)
+============================================================= */
+
+/* ── 1. ETHIOPIAN CALENDAR ENGINE ──
+   FIXED: the previous gregToJDN/jdnToGreg/ethToJDN formulas were not exact
+   inverses of one another, which made ethToGreg() (Ethiopian → Gregorian)
+   drift by up to several days/weeks and show the wrong weekday (e.g. today,
+   Sene 24 2018 E.C., was showing as Thursday instead of the correct
+   Wednesday). This version uses a single, self-consistent day-count based
+   on JS's own UTC date math (guaranteed correct for the proleptic Gregorian
+   calendar) and a re-calibrated epoch, verified round-trip-exact against
+   known anchor dates:
+     - Meskerem 1, 2018 E.C. = Thu, Sep 11, 2025
+     - Sene 24, 2018 E.C.    = Wed, Jul 1, 2026 (today)
+*/
+const EC_EPOCH = -716732;
+const ETH_MONTHS    = ['መስከረም','ጥቅምት','ኅዳር','ታኅሣሥ','ጥር','የካቲት','መጋቢት','ሚያዝያ','ግንቦት','ሰኔ','ሐምሌ','ነሐሴ','ጳጉሜ'];
+const ETH_MONTHS_EN = ['Meskerem','Tikimt','Hidar','Tahsas','Tir','Yekatit','Megabit','Miazia','Ginbot','Sene','Hamle','Nehase','Pagume'];
+const ETH_DAYS_EN   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const GREG_DAYS     = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+const GREG_MONTHS   = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const GREG_MONTHS_S = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+/* Days-since-Unix-epoch (UTC), the single source of truth day-count.
+   gregToJDN/jdnToGreg are exact inverses of each other by construction. */
+function gregToJDN(y,m,d){ return Math.round(Date.UTC(y,m-1,d)/86400000); }
+function jdnToGreg(J){
+  const dt=new Date(J*86400000);
+  return new Date(dt.getUTCFullYear(), dt.getUTCMonth(), dt.getUTCDate());
+}
+function ethToJDN(ey,em,ed){
+  const cycle=Math.floor(ey/4), yo=ey%4, n=(em-1)*30+(ed-1);
+  return EC_EPOCH + cycle*1461 + yo*365 + n;
+}
+function jdnToEth(J){
+  const r=(J-EC_EPOCH)%1461, n=r%365+365*Math.floor(r/1460);
+  const ey=4*Math.floor((J-EC_EPOCH)/1461)+Math.floor(r/365)-Math.floor(r/1460);
+  const em=Math.floor(n/30)+1, ed=(n%30)+1, mi=Math.min(em-1,12);
+  return {year:ey,month:Math.min(em,13),day:ed,monthName:ETH_MONTHS[mi],monthNameEn:ETH_MONTHS_EN[mi]};
+}
+function gregToEth(d){ return jdnToEth(gregToJDN(d.getFullYear(),d.getMonth()+1,d.getDate())); }
+function ethToGreg(ey,em,ed){ return jdnToGreg(ethToJDN(ey,em,ed)); }
+function ethDaysInMonth(ey,em){ return em<=12?30:((ey%4===3)?6:5); }
+function ethMonthStartDow(ey,em){ return ethToGreg(ey,em,1).getDay(); }
+
+/* ── Islamic (Hijri) tabular calendar — for Eid al-Fitr, Eid al-Adha, Mawlid ── */
+const ISLAMIC_EPOCH = -492148; /* 1 Muharram 1 AH, on the same day-count scale as gregToJDN */
+const HIJRI_MONTHS=['Muharram','Safar',"Rabi' al-Awwal","Rabi' al-Thani",'Jumada al-Awwal','Jumada al-Thani','Rajab',"Sha'ban",'Ramadan','Shawwal',"Dhu al-Qi'dah",'Dhu al-Hijjah'];
+function islamicToJDN(y,m,d){ return d + Math.ceil(29.5*(m-1)) + (y-1)*354 + Math.floor((3+11*y)/30) + ISLAMIC_EPOCH - 1; }
+function jdnToIslamic(J){
+  const y=Math.floor((30*(J-ISLAMIC_EPOCH)+10646)/10631);
+  const m=Math.min(12, Math.ceil((J-(29+islamicToJDN(y,1,1)))/29.5)+1);
+  const d=J-islamicToJDN(y,m,1)+1;
+  return {year:y,month:m,day:d};
+}
+/* Find the Gregorian date of a given Hijri month/day nearest to a reference Gregorian year */
+function hijriEventInGregYear(hMonth,hDay,gYearRef){
+  const approxHY=Math.floor((gYearRef-622)*33/32);
+  let best=null;
+  for(let hy=approxHY-1;hy<=approxHY+1;hy++){
+    const g=jdnToGreg(islamicToJDN(hy,hMonth,hDay));
+    if(g.getFullYear()===gYearRef){best=g;break;}
+  }
+  return best||jdnToGreg(islamicToJDN(approxHY,hMonth,hDay));
+}
+/* ── Orthodox (Julian-calendar) Easter — for Siklet (Good Friday) & Fasika (Easter) ── */
+function orthodoxEaster(year){
+  const a=year%4,b=year%7,c=year%19,d=(19*c+15)%30,e=(2*a+4*b-d+34)%7;
+  const month=Math.floor((d+e+114)/31), day=((d+e+114)%31)+1;
+  /* Julian → Gregorian: +13 days offset (valid for 1900-2099) */
+  return new Date(Date.UTC(year,month-1,day)+13*86400000);
+}
+const EthCal={gregToEth,ethToGreg,ethDaysInMonth,ethMonthStartDow,ETH_MONTHS,ETH_MONTHS_EN,
+  hijriEventInGregYear,orthodoxEaster,HIJRI_MONTHS};
+
+/* ── 2. LOCAL DATABASE ── */
+const DB={
+  get(k,def=null){try{const v=localStorage.getItem('ep_'+k);return v?JSON.parse(v):def;}catch{return def;}},
+  set(k,v){try{localStorage.setItem('ep_'+k,JSON.stringify(v));}catch{}},
+  del(k){try{localStorage.removeItem('ep_'+k);}catch{}}
+};
+
+/* ── 3. LANGUAGE SYSTEM ── */
+const LANG = {
+  en:{
+    home:'Home',calendar:'Calendar',mine:'Mine',settings:'Settings',
+    today:'Today',addEntry:'+ Add Entry',noEntries:'No entries — tap Add Entry',
+    daily:'Daily',weekly:'Weekly',monthly:'Monthly',myFiles:'My Files',
+    goToDate:'Go to date:',save:'Save',cancel:'Cancel',
+    schedulerTitle:'Scheduler & Reminder',
+    plannerTitle:'Planner Designer',
+    specialTitle:'Special Day Reminder',
+    goals:'Goals for the Day',schedule:'Schedule for Today',
+    todo:'To Do List',tomorrow:'For Tomorrow',notes:'Notes',
+    weeklyGoals:'Weekly Goals',priorities:'Priorities This Week',
+    weeklySchedule:'Weekly Schedule',savedPlans:'My Saved Plans',
+    logCycle:'Log Your Cycle',cycleStart:'Cycle Start Date',cycleEnd:'Cycle End Date',
+    avgCycle:'Avg Cycle Length',logBtn:'Log & Calculate',
+    flowDur:'Flow Duration',nextCycle:'Next Cycle Expected',
+    reminder1day:'1-Day Reminder',ovulation:'Ovulation Window',
+    profileInfo:'Profile Information',fullName:'Full Name',username:'Username',
+    bio:'Bio',phone:'Phone',dob:'Date of Birth',gender:'Gender',optional:'(optional)',
+    male:'Male',female:'Female',clearGender:'Clear',language:'Language',
+    saveProfile:'Save Profile',productivity:'Productivity Score',achievements:'Achievements',
+    security:'Security',passwordLock:'Password Lock',patternLock:'Pattern Lock',
+    fingerprint:'Fingerprint',faceId:'Face Recognition',
+    theme:'Theme',light:'Light',dark:'Dark',systemDefault:'System Default',
+    calPrefs:'Calendar Preferences',primaryCal:'Primary Calendar',
+    alarmSound:'Alarm Sound',preview:'Preview',uploadSound:'Upload Custom Sound',
+    noCustomSound:'No custom sound loaded',snooze:'Snooze 5min',dismiss:'Dismiss',
+    newEntry:'New Entry',title:'Title',sticker:'Sticker',date:'Date',
+    reminderTime:'Reminder Time',alarm:'Alarm',repeat:'Repeat',
+    never:'Never',daily_r:'Daily',weekly_r:'Weekly',customDays:'Custom Days',
+    calType:'Calendar Type',enterTitle:'Please enter a title',
+    entrySaved:'Entry saved!',planSaved:'Plan saved!'
+  },
+  am:{
+    home:'ቤት',calendar:'ቀን መቁጠሪያ',mine:'የኔ',settings:'ቅንብሮች',
+    today:'ዛሬ',addEntry:'+ ግቤት ጨምር',noEntries:'ምንም ግቤት የለም',
+    daily:'ዕለታዊ',weekly:'ሳምንታዊ',monthly:'ወርሃዊ',myFiles:'ፋይሎቼ',
+    goToDate:'ቀን ምረጥ:',save:'አስቀምጥ',cancel:'ሰርዝ',
+    schedulerTitle:'መርሃ ግብር እና ማሳሰቢያ',
+    plannerTitle:'የዕቅድ ዲዛይነር',
+    specialTitle:'ልዩ ቀን ማሳሰቢያ',
+    goals:'የቀኑ ግቦች',schedule:'የዛሬ መርሃ ግብር',
+    todo:'የሥራ ዝርዝር',tomorrow:'ለነገ',notes:'ማስታወሻ',
+    weeklyGoals:'የሳምንቱ ግቦች',priorities:'የዚህ ሳምንት ቅድሚያዎች',
+    weeklySchedule:'ሳምንታዊ መርሃ ግብር',savedPlans:'የተቀመጡ ዕቅዶቼ',
+    logCycle:'ዑደቱን ያስቀምጡ',cycleStart:'የዑደት መጀመሪያ ቀን',cycleEnd:'የዑደት መጨረሻ ቀን',
+    avgCycle:'አማካይ የዑደት ርዝማኔ',logBtn:'አስቀምጥ እና አሰላ',
+    flowDur:'የፍሰት ቆይታ',nextCycle:'ቀጣይ ዑደት የሚጠበቅ',
+    reminder1day:'1-ቀን ማሳሰቢያ',ovulation:'የእንቁላል ለቀቅ ጊዜ',
+    profileInfo:'የፕሮፋይል መረጃ',fullName:'ሙሉ ስም',username:'የተጠቃሚ ስም',
+    bio:'ስለ እኔ',phone:'ስልክ',dob:'የትውልድ ቀን',gender:'ፆታ',optional:'(አስፈላጊ አይደለም)',
+    male:'ወንድ',female:'ሴት',clearGender:'ጽዳ',language:'ቋንቋ',
+    saveProfile:'ፕሮፋይል አስቀምጥ',productivity:'የምርታማነት ነጥብ',achievements:'ስኬቶች',
+    security:'ደህንነት',passwordLock:'የይለፍ ቃል ቁልፍ',patternLock:'ዘይቤ ቁልፍ',
+    fingerprint:'የጣት አሻራ',faceId:'የፊት ለፊት ማወቅ',
+    theme:'ገጽታ',light:'ብርሃን',dark:'ጨለማ',systemDefault:'የስርዓት ነባሪ',
+    calPrefs:'የቀን መቁጠሪያ ቅምሮች',primaryCal:'ዋና ቀን መቁጠሪያ',
+    alarmSound:'የንቃት ድምፅ',preview:'ቅድመ ዕይታ',uploadSound:'ብጁ ድምፅ ጫን',
+    noCustomSound:'ምንም ብጁ ድምፅ አልተጫነም',snooze:'5 ደቂቃ አዘግይ',dismiss:'አሰናብት',
+    newEntry:'አዲስ ግቤት',title:'ርዕስ',sticker:'ስቲከር',date:'ቀን',
+    reminderTime:'የማሳሰቢያ ጊዜ',alarm:'ማንቂያ',repeat:'ድግግሞሽ',
+    never:'አትደግም',daily_r:'ዕለታዊ',weekly_r:'ሳምንታዊ',customDays:'ብጁ ቀናት',
+    calType:'የቀን መቁጠሪያ አይነት',enterTitle:'እባክህ ርዕስ ይጻፉ',
+    entrySaved:'ግቤት ተቀምጧል!',planSaved:'ዕቅድ ተቀምጧል!'
+  },
+  or:{
+    home:"Mana",calendar:"Kalindara",mine:"Kan Koo",settings:"Qindaa'insa",
+    today:"Har'a",addEntry:"+ Galchi Dabalii",noEntries:"Galchi hin jiru",
+    daily:"Guyyaa guyyaan",weekly:"Torbanaan",monthly:"Ji'aan",myFiles:"Faayiloota Koo",
+    goToDate:"Guyyaatti deebi'i:",save:"Ol'kaawwadhu",cancel:"Haqi",
+    schedulerTitle:"Karoora fi Yaadadhiisa",
+    plannerTitle:"Dizaayinara Karoora",
+    specialTitle:"Yaadadhiisa Guyyaa Addaa",
+    goals:"Galmoota Guyyaa",schedule:"Sagantaa Har'aaf",
+    todo:"Tarree Hojii",tomorrow:"Boru Dhaf",notes:"Yaaddannoo",
+    weeklyGoals:"Galmoota Torban",priorities:"Dursa Torban Kanaa",
+    weeklySchedule:"Sagantaa Torban",savedPlans:"Karoorota Ol'kaawwan",
+    logCycle:"Yeroo Marsaa Galchi",cycleStart:"Guyyaa Jalqaba Marsaa",cycleEnd:"Guyyaa Dhumaa Marsaa",
+    avgCycle:"Dheerina Marsaa Giddu Galaa",logBtn:"Galchi fi Herreegii",
+    flowDur:"Dheerina Yaa'ii",nextCycle:"Marsaan Itti Aanee",
+    reminder1day:"Yaadadhiisa 1-Guyyaa",ovulation:"Yeroo Ovuuleshiinii",
+    profileInfo:"Odeeffannoo Profaayilii",fullName:"Maqaa Guutuu",username:"Maqaa Fayyadamaa",
+    bio:"Waa'ee Koo",phone:"Bilbila",dob:"Guyyaa Dhalootaa",gender:"Saala",optional:"(dirqamaa miti)",
+    male:"Dhiira",female:"Dubartii",clearGender:"Haquu",language:"Afaan",
+    saveProfile:"Profaayilii Ol'kaawwadhu",productivity:"Qabxii Ol'aantummaa",achievements:"Bu'aa",
+    security:"Nageenya",passwordLock:"Cufaa Jecha Darbii",patternLock:"Cufaa Mallatoo",
+    fingerprint:"Waraqaa Quba",faceId:"Beekumsa Fuulaa",
+    theme:"Gurraacha",light:"Ifaa",dark:"Dukkana",systemDefault:"Salphata Sirna",
+    calPrefs:"Filannoota Kalindara",primaryCal:"Kalindara Ijoo",
+    alarmSound:"Sagalee Beeksisaa",preview:"Dur Ilaalii",uploadSound:"Sagalee Dhuunfaa Fe'i",
+    noCustomSound:"Sagalee dhuunfaa hin fe'amne",snooze:"Daqiiqaa 5 Tursiisi",dismiss:"Cufii",
+    newEntry:"Galcha Haaraa",title:"Mata Duree",sticker:"Maxxansaa",date:"Guyyaa",
+    reminderTime:"Yeroo Yaadadhiisaa",alarm:"Beeksisaa",repeat:"Irra Deebi'i",
+    never:"Hin irra deebi'ine",daily_r:"Guyyaa guyyaan",weekly_r:"Torbanaan",customDays:"Guyyaota Addaa",
+    calType:"Gosa Kalindara",enterTitle:"Mata duree galchii",
+    entrySaved:"Galcha ol'kaawwame!",planSaved:"Karoora ol'kaawwame!"
+  },
+  ti:{
+    home:'ቤት',calendar:'ቀን ሕሳብ',mine:'ናተይ',settings:'ምውህሃዳት',
+    today:'ሎሚ',addEntry:'+ ምዝጋብ ወስኽ',noEntries:'ምዝጋብ የለን',
+    daily:'መዓልታዊ',weekly:'ሰሙናዊ',monthly:'ወርሓዊ',myFiles:'ፋይላተይ',
+    goToDate:'ናብ ዕለት:',save:'ዕቀብ',cancel:'ሰርዝ',
+    schedulerTitle:'መደብ ስርሓት ን ዘኻኻሪ',
+    plannerTitle:'ዲዛይነር ፕላን',
+    specialTitle:'ዘኻኻሪ ፍሉይ መዓልቲ',
+    goals:'ዕላማታት መዓልቲ',schedule:'መደብ ሎሚ',
+    todo:'ዝርዝር ስራሕ',tomorrow:'ንጽባሕ',notes:'ማስታወሻ',
+    weeklyGoals:'ዕላማታት ሰሙን',priorities:'ቀዳምነታት ናይዚ ሰሙን',
+    weeklySchedule:'ሰሙናዊ መደብ',savedPlans:'ዕቁባት ፕላናተይ',
+    logCycle:'ዑደት ምዝጋብ',cycleStart:'መጀምርታ ዕለት ዑደት',cycleEnd:'መወዳእታ ዕለት ዑደት',
+    avgCycle:'ማእከላይ ንውሓት ዑደት',logBtn:'ምዝጋብ ን ምስላ',
+    flowDur:'ዝርዝር ሰዓታት ፍሳስ',nextCycle:'ዝቕጽል ዑደት ዝጸበ',
+    reminder1day:'1-መዓልቲ ዘኻኻሪ',ovulation:'ጊዜ ፍርዮት',
+    profileInfo:'ሓበሬታ ፕሮፋይል',fullName:'ምሉእ ስም',username:'ስም ተጠቃሚ',
+    bio:'ብዛዕባ ኩዩ',phone:'ስልኪ',dob:'ዕለት ልደት',gender:'ጾታ',optional:'(ኣድላዪ ኣይኮነን)',
+    male:'ተባዕታይ',female:'ኣንስተይቲ',clearGender:'ጽሬት',language:'ቋንቋ',
+    saveProfile:'ፕሮፋይል ዕቀብ',productivity:'ነጥቢ ምርታዕ',achievements:'ስኬታት',
+    security:'ድሕነት',passwordLock:'ቁልፊ መተሓላለፊ ቃል',patternLock:'ቁልፊ ዝርዝር',
+    fingerprint:'ሕላፊ ጽሑፍ',faceId:'ፍልጠት ገጽ',
+    theme:'መልክዕ',light:'ብርሃን',dark:'ጸሊም',systemDefault:'ሲስተም ነባሪ',
+    calPrefs:'ምርጫ ቀን ሕሳብ',primaryCal:'ዋና ቀን ሕሳብ',
+    alarmSound:'ድምጺ ምስምሳ',preview:'ቅድሚ ምርኣይ',uploadSound:'ብጁ ድምጺ ጸዓን',
+    noCustomSound:'ብጁ ድምጺ ኣይጸዓነን',snooze:'5 ደቒቓ ምስምሳ',dismiss:'ምስናዕ',
+    newEntry:'ሓዲሽ ምዝጋብ',title:'ኣርእስቲ',sticker:'ስቲከር',date:'ዕለት',
+    reminderTime:'ሰዓት ዘኻኻሪ',alarm:'ምስምሳ',repeat:'ምድጋም',
+    never:'ኣይምለስን',daily_r:'መዓልታዊ',weekly_r:'ሰሙናዊ',customDays:'ፍሉያት ዓዲታት',
+    calType:'ዓይነት ቀን ሕሳብ',enterTitle:'ኣርእስቲ ምስፋር',
+    entrySaved:'ምዝጋብ ዓቂቡ!',planSaved:'ፕላን ዓቂቡ!'
+  }
+};
+
+let _lang = 'en';
+function T(k){ return (LANG[_lang]&&LANG[_lang][k])||LANG.en[k]||k; }
+
+function applyLanguage(lang){
+  _lang = lang || 'en';
+  document.documentElement.lang = lang;
+  // Bottom nav
+  const navPages = ['home','calendar','mine','settings'];
+  navPages.forEach(page=>{
+    const btn = document.querySelector('.bnav-item[data-page="'+page+'"]');
+    if(btn){ const sp=btn.querySelector('span'); if(sp) sp.textContent=T(page); }
+  });
+  // Section headers
+  const sections = {
+    'sec-scheduler':'schedulerTitle',
+    'sec-planner':'plannerTitle',
+    'sec-special':'specialTitle'
+  };
+  Object.entries(sections).forEach(([id,key])=>{
+    const el=document.querySelector('#'+id+' .hsc-title');
+    if(el) el.textContent=T(key);
+  });
+  // Planner sub-tabs
+  document.querySelectorAll('.vtab[data-pv]').forEach(btn=>{
+    const pv=btn.dataset.pv;
+    if(pv==='daily') btn.textContent=T('daily');
+    else if(pv==='weekly') btn.textContent=T('weekly');
+    else if(pv==='monthly') btn.textContent=T('monthly');
+    else if(pv==='myfiles') btn.textContent=T('myFiles');
+  });
+  // Scheduler view tabs
+  document.querySelectorAll('.vtab[data-sv]').forEach(btn=>{
+    const sv=btn.dataset.sv;
+    if(sv==='day') btn.textContent=T('daily');
+    else if(sv==='week') btn.textContent=T('weekly');
+    else if(sv==='month') btn.textContent=T('monthly');
+  });
+  // Calendar type buttons
+  const ethBtn=document.getElementById('sched-eth-btn');
+  const gregBtn=document.getElementById('sched-greg-btn');
+  if(ethBtn) ethBtn.textContent='🇪🇹 '+T('ethiopian');
+  if(gregBtn) gregBtn.textContent='🌍 '+T('gregorian');
+  const calEthBtn=document.getElementById('calBtn-eth');
+  const calGregBtn=document.getElementById('calBtn-greg');
+  const calBothBtn=document.getElementById('calBtn-both');
+  if(calEthBtn) calEthBtn.textContent='🇪🇹 '+T('ethiopian');
+  if(calGregBtn) calGregBtn.textContent='🌍 '+T('gregorian');
+  if(calBothBtn) calBothBtn.textContent=T('both');
+  // Planner block titles - update visible ones
+  const plannerBlocks = {
+    'dp-goals':T('goals'), 'dp-schedule':T('schedule'),
+    'dp-todo':T('todo'), 'dp-tomorrow':T('tomorrow'), 'dp-notes':T('notes'),
+    'wp-goals':T('weeklyGoals'), 'wp-priorities':T('priorities'),
+    'wp-schedule-wrap':T('weeklySchedule'), 'wp-todo':T('todo')
+  };
+  Object.entries(plannerBlocks).forEach(([id,label])=>{
+    const el=document.getElementById(id);
+    if(el){
+      const titleEl=el.previousElementSibling;
+      if(titleEl&&titleEl.classList.contains('pb-title')){ const i=titleEl.querySelector('i'); titleEl.textContent=''; if(i)titleEl.appendChild(i); titleEl.appendChild(document.createTextNode(' '+label)); }
+    }
+  });
+  // Profile section labels
+  const pfLabels = {
+    pfName:T('fullName'), pfUsername:T('username'), pfBio:T('bio'),
+    pfPhone:T('phone'), pfDob:T('dob'), pfLanguage:T('language')
+  };
+  Object.entries(pfLabels).forEach(([id,label])=>{
+    const el=document.getElementById(id);
+    if(el){ const lbl=el.closest('.pfield')&&el.closest('.pfield').querySelector('label'); if(lbl) lbl.firstChild.textContent=label+' '; }
+  });
+  // Today label
+  if(_schedulerInited) updateTodayLabel();
+  DB.set('lang',lang);
+}
+
+/* ── 4. STATIC DATA ── */
+const ORTHODOX_DAYS=[
+  {day:1,en:'Lideta, Raguel, Eliyas',am:'ልደተ ማርያም፣ ራጉኤል፣ ኤልያስ'},
+  {day:2,en:'Peter, Thaddaeus, Job, Bartholomew',am:'ጴጥሮስ፣ ታድዎስ፣ ኢዮብ፣ ባርቶሎሜዎስ'},
+  {day:3,en:"Be'eta Maryam, Zena Markos, Ne'akuto Le'eab",am:'በአታ ማርያም፣ ዘነ ማርቆስ፣ ንአኩቶ ለአብ'},
+  {day:4,en:'John Son of Thunder, Abba Macarius',am:'ዮሐንስ የነጎድጓድ ልጅ፣ አባ ማካሪዮስ'},
+  {day:5,en:'Peter and Paul, Abune Gebre Menfes Kiddus',am:'ጴጥሮስና ጳውሎስ፣ አቡነ ገብረ መንፈስ ቅዱስ'},
+  {day:6,en:'Iyesus, Quaquam, St. Arsema',am:'ኢየሱስ፣ ቁስቋም፣ ቅዱስ አርሴማ'},
+  {day:7,en:'Holy Trinity, Philemon',am:'ቅዱስ ሥላሴ፣ ፊልሞን'},
+  {day:8,en:'Matthew, Abba Kirkos',am:'ማቴዎስ፣ አባ ቂርቆስ'},
+  {day:9,en:'Thomas, Andrew, Forty Martyrs',am:'ቶማስ፣ አንድርዎስ፣ አርባ ሰማዕታት'},
+  {day:10,en:'Feast of the Cross',am:'በዓለ መስቀል'},
+  {day:11,en:'Hanna and Joachim, Abune Hara, St. Fasilides',am:'ሐናና ዮዓኪም፣ አቡነ ሐራ፣ ቅዱስ ፋሲልደስ'},
+  {day:12,en:'St. Michael, Kristos Semra, Abba Samuel',am:'ቅዱስ ሚካኤል፣ ክርስቶስ ሰምራ፣ አባ ሳሙኤል'},
+  {day:13,en:'God the Father, St. Raphael',am:'እግዚአብሔር አብ፣ ቅዱስ ሩፋኤል'},
+  {day:14,en:'Abune Aregawi, Gebre Kristos',am:'አቡነ አረጋዊ፣ ገብረ ክርስቶስ'},
+  {day:15,en:'Kirkos and Iyeluta, Silphakos',am:'ቂርቆስና ኢየሉጣ፣ ሲልፋቆስ'},
+  {day:16,en:'Kidane Mihret, Bishop Michael',am:'ኪዳነ ምሕረት፣ አቡነ ሚካኤል'},
+  {day:17,en:'St. Stephen, Lukas of the Pillar',am:'ቅዱስ ስቲፋኖስ፣ ሉቃስ የአምድ'},
+  {day:18,en:'St. Philip, Abune Ewostatewos',am:'ቅዱስ ፊልጶስ፣ አቡነ ኢዎስጣቴዎስ'},
+  {day:19,en:'St. Gabriel, Arkadius',am:'ቅዱስ ገብርኤል፣ አርካዲዮስ'},
+  {day:20,en:'Tsinseta, Elisha, Haggai',am:'ጽንሰታ፣ ኤልሳ፣ ሐጋይ'},
+  {day:21,en:'Holy Virgin Mary',am:'ቅድስት ድንግል ማርያም'},
+  {day:22,en:'St. Urael, James the Oriental, Deqsius',am:'ቅዱስ ኡሪኤል፣ ያዕቆብ ኦሪያናል፣ ዴቅሲዮስ'},
+  {day:23,en:'St. George',am:'ቅዱስ ጊዮርጊስ'},
+  {day:24,en:'Abune Tekle Haymanot',am:'አቡነ ተክለ ሃይማኖት'},
+  {day:25,en:'St. Mercurius, Anifnos',am:'ቅዱስ መርቆሪዮስ፣ አኒፍኖስ'},
+  {day:26,en:'Hosea the Prophet',am:'ነቢዩ ሆሴዕ'},
+  {day:27,en:'Medhane Alem, Hezekiah, Abba Yohannes',am:'መድኃኔ ዓለም፣ ሕዝቅያስ፣ አባ ዮሐንስ'},
+  {day:28,en:'Immanuel, Constantine, Abraham',am:'ኢማኑኤል፣ ኮንስታንቲኖስ፣ አብርሃም'},
+  {day:29,en:'Bale Wold, Samuel of Wegeg',am:'በአለ ወልድ፣ ሳሙኤል ወደ ወገግ'},
+  {day:30,en:'Mark the Evangelist, John the Baptist',am:'ቅዱስ ማርቆስ ወንጌላዊ፣ ዮሐንስ መጥምቁ'}
+];
+
+const YEARLY_FEASTS=[
+  {ethM:1,day:1,month:'Meskerem',en:'Saint Raguel',am:'ቅዱስ ራጉኤል'},
+  {ethM:1,day:2,month:'Meskerem',en:'John the Baptist',am:'ዮሐንስ መጥምቁ'},
+  {ethM:1,day:21,month:'Meskerem',en:'Menagesha, Gishen & Entoto Maryam',am:'መነጋሻ፣ ግሸን፣ እንጦቶ ማርያም'},
+  {ethM:1,day:29,month:'Meskerem',en:'Saint Arsema',am:'ቅዱስ አርሴማ'},
+  {ethM:2,day:5,month:'Tikimt',en:'Abune Gebre Menfes Kidus',am:'አቡነ ገብረ መንፈስ ቅዱስ'},
+  {ethM:2,day:14,month:'Tikimt',en:'Abune Aregawi, Gebre Kristos',am:'አቡነ አረጋዊ፣ ገብረ ክርስቶስ'},
+  {ethM:2,day:17,month:'Tikimt',en:'Saint Stephen',am:'ቅዱስ ስቲፋኖስ'},
+  {ethM:2,day:22,month:'Tikimt',en:'Saint Luke the Evangelist',am:'ቅዱስ ሉቃስ ወንጌላዊ'},
+  {ethM:2,day:27,month:'Tikimt',en:'Medhane Alem',am:'መድኃኔ ዓለም'},
+  {ethM:2,day:28,month:'Tikimt',en:'Saint Emmanuel',am:'ቅዱስ ኢማኑኤል'},
+  {ethM:2,day:30,month:'Tikimt',en:'Saint Mark',am:'ቅዱስ ማርቆስ'},
+  {ethM:3,day:6,month:'Hidar',en:'Qusquam Maryam',am:'ቁስቋም ማርያም'},
+  {ethM:3,day:7,month:'Hidar',en:'St. George Church',am:'ቅዱስ ጊዮርጊስ ቤተክርስቲያን'},
+  {ethM:3,day:8,month:'Hidar',en:'Abba Kiros',am:'አባ ኪሮስ'},
+  {ethM:3,day:12,month:'Hidar',en:'Saint Michael',am:'ቅዱስ ሚካኤል'},
+  {ethM:3,day:13,month:'Hidar',en:'God the Father',am:'እግዚአብሔር አብ'},
+  {ethM:3,day:21,month:'Hidar',en:'Tsion Maryam',am:'ጽዮን ማርያም'},
+  {ethM:3,day:25,month:'Hidar',en:'Saint Mercurius',am:'ቅዱስ መርቆሪዮስ'},
+  {ethM:4,day:1,month:'Tahsas',en:'Elias the Prophet',am:'ነቢዩ ኤልያስ'},
+  {ethM:4,day:3,month:'Tahsas',en:"Ba'ata LeMaryam, Abune Zena Marqos",am:'በአታ ለማርያም፣ አቡነ ዘነ ማርቆስ'},
+  {ethM:4,day:12,month:'Tahsas',en:'Abba Samuel',am:'አባ ሳሙኤል'},
+  {ethM:4,day:19,month:'Tahsas',en:'Feast of Saint Gabriel',am:'በዓል ቅዱስ ገብርኤል'},
+  {ethM:4,day:22,month:'Tahsas',en:'Annunciation of Gabriel',am:'ማህበረ ገብርኤል'},
+  {ethM:4,day:24,month:'Tahsas',en:'Abune Tekle Haymanot',am:'አቡነ ተክለ ሃይማኖት'},
+  {ethM:4,day:28,month:'Tahsas',en:'Saint Emmanuel',am:'ቅዱስ ኢማኑኤል'},
+  {ethM:5,day:1,month:'Tir',en:'Saint Stephen',am:'ቅዱስ ስቲፋኖስ'},
+  {ethM:5,day:4,month:'Tir',en:'Saint John',am:'ቅዱስ ዮሐንስ'},
+  {ethM:5,day:7,month:'Tir',en:'Holy Trinity',am:'ቅዱስ ሥላሴ'},
+  {ethM:5,day:12,month:'Tir',en:'Saint Michael',am:'ቅዱስ ሚካኤል'},
+  {ethM:5,day:13,month:'Tir',en:'Saint Raphael',am:'ቅዱስ ሩፋኤል'},
+  {ethM:5,day:15,month:'Tir',en:'Saint Cyriacus (Qirqos)',am:'ቅዱስ ቂርቆስ'},
+  {ethM:5,day:18,month:'Tir',en:'Saint George',am:'ቅዱስ ጊዮርጊስ'},
+  {ethM:5,day:21,month:'Tir',en:'Dormition of Our Lady Mary',am:'ድንግል ማርያም መንፈስ'},
+  {ethM:5,day:22,month:'Tir',en:'Saint Uriel',am:'ቅዱስ ኡሪኤል'},
+  {ethM:5,day:28,month:'Tir',en:'Saint Emmanuel',am:'ቅዱስ ኢማኑኤል'},
+  {ethM:6,day:16,month:'Yekatit',en:'Kidane Mehret',am:'ኪዳነ ምሕረት'},
+  {ethM:6,day:20,month:'Yekatit',en:'Saint Philip',am:'ቅዱስ ፊልጶስ'},
+  {ethM:6,day:23,month:'Yekatit',en:'Saint George',am:'ቅዱስ ጊዮርጊስ'},
+  {ethM:7,day:10,month:'Megabit',en:'Cross of Jesus',am:'መስቀለ ኢየሱስ'},
+  {ethM:7,day:27,month:'Megabit',en:'Medhane Alem',am:'መድኃኔ ዓለም'},
+  {ethM:8,day:23,month:'Miazia',en:'Martyrdom of Saint George',am:'ቅዱስ ጊዮርጊስ ሰማዕት'},
+  {ethM:9,day:1,month:'Ginbot',en:'Lideta LeMaryam',am:'ልደተ ማርያም'},
+  {ethM:9,day:11,month:'Ginbot',en:'Saint Yared',am:'ቅዱስ ያሬድ'},
+  {ethM:9,day:21,month:'Ginbot',en:'St. Mary at Debre Mitmaq',am:'ድንግል ማርያም ደብረ ምጥማቅ'},
+  {ethM:10,day:12,month:'Sene',en:'Saint Michael',am:'ቅዱስ ሚካኤል'},
+  {ethM:10,day:21,month:'Sene',en:'Consecration of Church of St. Mary',am:'ቤተክርስቲያን ማርያም'},
+  {ethM:10,day:30,month:'Sene',en:'Nativity of John the Baptist',am:'ልደተ ዮሐንስ መጥምቁ'},
+  {ethM:11,day:5,month:'Hamle',en:'Saints Peter and Paul',am:'ቅዱሳን ጴጥሮስና ጳውሎስ'},
+  {ethM:11,day:7,month:'Hamle',en:'Holy Trinity, Abba Giyorgis',am:'ቅዱስ ሥላሴ፣ አባ ጊዮርጊስ ጋሻ'},
+  {ethM:11,day:19,month:'Hamle',en:'Saint Gabriel',am:'ቅዱስ ገብርኤል'},
+  {ethM:11,day:23,month:'Hamle',en:'Saint George',am:'ቅዱስ ጊዮርጊስ'},
+  {ethM:12,day:16,month:'Nehase',en:'Kidane Mehret (Filsata)',am:'ኪዳነ ምሕረት (ፍልሳታ)'},
+  {ethM:12,day:24,month:'Nehase',en:'Abune Tekle Haymanot, Kristos Semra',am:'አቡነ ተክለ ሃይማኖት፣ ክርስቶስ ሰምራ'},
+  {ethM:13,day:3,month:'Pagume',en:'Saint Raphael',am:'ቅዱስ ሩፋኤል'}
+];
+
+const PUBLIC_HOLIDAYS=[
+  {date:'01-07',en:'Ethiopian Christmas — Genna',am:'ጋና / ልደት',ethDate:'Tahsas 29 E.C.'},
+  {date:'01-19',en:'Epiphany — Timkat',am:'ጥምቀት',ethDate:'Tir 11 E.C.'},
+  {date:'02-02',en:'Victory of Adwa',am:'የዓድዋ ድል',ethDate:'Yekatit 23 E.C.'},
+  {date:'05-01',en:'International Labour Day',am:'የሠራተኞች ቀን',ethDate:'Miazia 23 E.C.'},
+  {date:'05-05',en:"Ethiopian Patriots' Victory Day",am:'የአርበኞች ቀን',ethDate:'Miazia 27 E.C.'},
+  {date:'05-28',en:'Downfall of the Derg',am:'ደርግ የፈረሰበት ቀን',ethDate:'Ginbot 20 E.C.'},
+  {date:'09-11',en:'Ethiopian New Year — Enkutatash',am:'ኢንቁጣጣሽ',ethDate:'Meskerem 1 E.C.'},
+  {date:'09-27',en:'Meskel — Finding of the True Cross',am:'መስቀል',ethDate:'Meskerem 17 E.C.'},
+  {date:'01-01',en:"New Year's Day (Gregorian)",am:'ዘመን መለወጫ (ግሪጎሪያን)',ethDate:'Tahsas 22 E.C.'}
+];
+
+/* ── PUBLIC HOLIDAY TABLE (multi-language: English, Amharic, Afaan Oromo, Tigrigna) ──
+   Fixed-date holidays are given in Ethiopian month/day; movable holidays are
+   computed each year from the Islamic (Hijri) or Julian-Easter calendars. */
+const PUBLIC_HOLIDAYS_TABLE=[
+  {kind:'fixed',ethM:1,ethD:1,dayOff:true,
+    names:{en:'New Year (Enkutatash)',am:'እንቁጣጣሽ',or:"Bara Haaraa (Enkutatash)",ti:'ርእሰ ዓመት (እንቁጣጣሽ)'}},
+  {kind:'fixed',ethM:1,ethD:17,dayOff:true,
+    names:{en:'Meskel (Finding of the True Cross)',am:'መስቀል',or:'Masqal',ti:'መስቀል'}},
+  {kind:'fixed',ethM:4,ethD:29,dayOff:true,
+    names:{en:'Ethiopian Christmas (Genna)',am:'ገና',or:'Geenaa',ti:'ልደት (ገና)'}},
+  {kind:'fixed',ethM:5,ethD:11,dayOff:true,
+    names:{en:'Epiphany (Timkat)',am:'ጥምቀት',or:'Timqat',ti:'ጥምቀት'}},
+  {kind:'fixed',ethM:6,ethD:23,dayOff:true,
+    names:{en:'Adwa Victory Day',am:'የዓድዋ ድል በዓል',or:'Ayyaana Injifannoo Adwaa',ti:'በዓል ዓወት ዓድዋ'}},
+  {kind:'islamic',hMonth:10,hDay:1,dayOff:true,
+    names:{en:'Eid al-Fitr',am:'ኢድ አልፈጥር',or:'Iidal Fixrii',ti:'ዒድ አልፈጥር'}},
+  {kind:'orthodoxEaster',offsetDays:-2,dayOff:true,
+    names:{en:'Siklet (Good Friday)',am:'ስቅለት',or:'Siqlata',ti:'ዓርቢ ስቕለት'}},
+  {kind:'orthodoxEaster',offsetDays:0,dayOff:true,
+    names:{en:'Ethiopian Easter (Fasika)',am:'ፋሲካ',or:'Faasiikaa',ti:'ትንሳኤ (ፋሽካ)'}},
+  {kind:'fixed',ethM:8,ethD:23,dayOff:true,
+    names:{en:'Labour Day',am:'የሠራተኞች ቀን',or:'Guyyaa Hojjettootaa',ti:'መዓልቲ ሰራሕተኛታት'}},
+  {kind:'fixed',ethM:8,ethD:27,dayOff:true,
+    names:{en:"Patriots' Day",am:'የአርበኞች ቀን',or:'Guyyaa Gootota',ti:'መዓልቲ ኣርበኛታት'}},
+  {kind:'islamic',hMonth:12,hDay:10,dayOff:true,
+    names:{en:'Eid al-Adha',am:'ኢድ አልአድሃ (አረፋ)',or:'Iidal Adhaa',ti:'ዒድ አልኣድሓ'}},
+  {kind:'islamic',hMonth:3,hDay:12,dayOff:true,
+    names:{en:"Mawlid al-Nabi",am:'መውሊድ',or:"Mawliida Nabiyyii",ti:'መውሊድ'}}
+];
+/* Compute one holiday's Gregorian date, weekday, and Ethiopian date-string for a given E.C. year */
+function computeHolidayOccurrence(h,ethYear){
+  let g,eth;
+  if(h.kind==='fixed'){
+    eth={year:ethYear,month:h.ethM,day:h.ethD};
+    g=EthCal.ethToGreg(ethYear,h.ethM,h.ethD);
+  }else if(h.kind==='islamic'){
+    const refG=EthCal.ethToGreg(ethYear,6,1); // Yekatit 1 — safely inside the later Gregorian year of the E.C. span
+    g=EthCal.hijriEventInGregYear(h.hMonth,h.hDay,refG.getFullYear());
+    eth=EthCal.gregToEth(g);
+  }else if(h.kind==='orthodoxEaster'){
+    const refG=EthCal.ethToGreg(ethYear,6,1);
+    const easter=EthCal.orthodoxEaster(refG.getFullYear());
+    g=new Date(easter.getTime()+(h.offsetDays||0)*86400000);
+    g=new Date(g.getUTCFullYear(),g.getUTCMonth(),g.getUTCDate());
+    eth=EthCal.gregToEth(g);
+  }
+  return {g,eth};
+}
+const MUSLIM_HOLIDAYS=[
+  {en:'Eid al-Fitr (End of Ramadan)',am:'ፈጡር / ኢዲ ፈጥር',note:'1 Shawwal — varies yearly'},
+  {en:"Eid al-Adha (Feast of Sacrifice)",am:'ዒድ አልዐዳ / አረፋ',note:'10 Dhul Hijja — varies yearly'},
+  {en:"Mawlid al-Nabi (Prophet's Birthday)",am:'መውሊድ',note:'12 Rabi al-Awwal — varies yearly'},
+  {en:'Ramadan (Holy Month of Fasting)',am:'ረመዳን',note:'30 days — varies yearly'},
+  {en:'Islamic New Year (Muharram)',am:'የሂጅራ አዲስ ዓመት',note:'1 Muharram — varies yearly'},
+  {en:'Ashura',am:'ዓሹራ',note:'10 Muharram — varies yearly'},
+  {en:'Lailat al-Qadr (Night of Power)',am:'ሌሊት አልቀደር',note:"27th night of Ramadan"}
+];
+const ORTHODOX_FASTING=[
+  {en:'Hudade Tsom — Great Lent',am:'ሁዳዴ ጾም',note:'55 days before Easter (Fasika)'},
+  {en:"Tsome Hawaryat — Apostles' Fast",am:'ጾም ሐዋርያት',note:'After Pentecost, variable length'},
+  {en:'Tsome Filseta — Fast of the Assumption',am:'ጾም ፍልሰታ',note:'Hamle 24 – Nehase 16 E.C.'},
+  {en:'Tsome Nebiyat — Fast of the Prophets',am:'ጾም ነቢያት',note:'43 days before Christmas'},
+  {en:'Tsome Nineveh — Nineveh Fast',am:'ጾም ነነዌ',note:'3 days, 3 weeks before Lent'},
+  {en:'Wednesday & Friday year-round',am:'ሁሉም ረቡዕ እና አርብ',note:'Year-round fasting days'}
+];
+
+/* ── 5. UTILITIES ── */
+function pad(n){return String(n).padStart(2,'0');}
+function fmtKey(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+function weekStart(d){const c=new Date(d);c.setDate(c.getDate()-c.getDay());return c;}
+function fmtDate(d,opts){try{return d.toLocaleDateString('en-US',opts||{weekday:'long',year:'numeric',month:'long',day:'numeric'});}catch{return d.toDateString();}}
+function geezNum(n){const o=['','፩','፪','፫','፬','፭','፮','፯','፰','፱'],t=['','፲','፳','፴','፵','፶','፷','፸','፹','፺'];return n>=100?'፻':(t[Math.floor(n/10)]||'')+(o[n%10]||'');}
+function showToast(msg,ms){
+  ms=ms||2600;
+  const el=document.getElementById('toast');
+  if(!el)return;
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),ms);
+}
+function feastGregDate(ethM,ethDay){
+  try{const e=EthCal.gregToEth(new Date());const g=EthCal.ethToGreg(e.year,ethM,ethDay);return g.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}catch{return '';}
+}
+
+/* ── 6. NAVIGATION ── */
+let _currentPage='home';
+function navigate(page){
+  _currentPage=page;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
+  const pg=document.getElementById('page-'+page);if(pg)pg.classList.add('active');
+  const bn=document.querySelector('.bnav-item[data-page="'+page+'"]');if(bn)bn.classList.add('active');
+  window.scrollTo(0,0);
+  if(page==='calendar')initCalendarPage();
+  if(page==='profile')initProfilePage();
+  if(page==='settings')initSettingsPage();
+}
+
+/* ── 7. SECTION ACCORDION ── */
+let _schedulerInited=false,_plannerInited=false,_periodInited=false;
+function toggleSection(id){
+  const body=document.getElementById('body-'+id);
+  const arrow=document.getElementById('arrow-'+id);
+  if(!body)return;
+  const collapsed=body.classList.contains('collapsed');
+  body.classList.toggle('collapsed',!collapsed);
+  if(arrow)arrow.style.transform=collapsed?'rotate(180deg)':'rotate(0deg)';
+  if(!collapsed)return;
+  if(id==='scheduler'&&!_schedulerInited){_schedulerInited=true;initScheduler();}
+  if(id==='planner'&&!_plannerInited){_plannerInited=true;initPlannerDesigner();}
+  if(id==='special'&&!_periodInited){_periodInited=true;initPeriodTracker();}
+}
+
+/* ── 8. SCHEDULER & REMINDER ── */
+let _schedCalType='eth',_schedDay=new Date(),_schedWeekStart=weekStart(new Date()),_schedMonthDate=new Date();
+
+function initScheduler(){
+  updateTodayLabel();
+  const ji=document.getElementById('dateJumpInput');if(ji)ji.value=fmtKey(new Date());
+  switchSchedView('day');
+}
+function updateTodayLabel(){
+  const today=new Date(),eth=EthCal.gregToEth(today);
+  const greg=fmtDate(today,{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const bar=document.getElementById('todayLabelBar');
+  if(bar)bar.innerHTML='<b>'+T('today')+':</b> '+greg+'<br>🇪🇹 <b>'+eth.monthName+' '+eth.day+', '+eth.year+' E.C.</b>';
+}
+function schedSwitchCalType(type){
+  _schedCalType=type;
+  document.getElementById('sched-eth-btn').classList.toggle('active',type==='eth');
+  document.getElementById('sched-greg-btn').classList.toggle('active',type==='greg');
+  renderSchedDay();renderSchedWeek();renderSchedMonth();
+}
+function switchSchedView(view){
+  document.querySelectorAll('.sv').forEach(v=>v.classList.remove('active'));
+  const el=document.getElementById('sv-'+view);if(el)el.classList.add('active');
+  document.querySelectorAll('.vtab[data-sv]').forEach(b=>b.classList.toggle('active',b.dataset.sv===view));
+  if(view==='day')renderSchedDay();
+  else if(view==='week')renderSchedWeek();
+  else renderSchedMonth();
+}
+function jumpToDate(val){
+  if(!val)return;
+  _schedDay=new Date(val+'T12:00:00');
+  _schedWeekStart=weekStart(new Date(_schedDay));
+  _schedMonthDate=new Date(_schedDay.getFullYear(),_schedDay.getMonth(),1);
+  switchSchedView('day');
+}
+function renderSchedDay(){
+  const d=_schedDay,eth=EthCal.gregToEth(d);
+  const title=_schedCalType==='eth'?(eth.monthName+' '+eth.day+', '+eth.year+' E.C.'):fmtDate(d,{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const tEl=document.getElementById('svDayTitle');if(tEl)tEl.textContent=title;
+  const key=fmtKey(d),events=DB.get('events_'+key,[])||[];
+  const area=document.getElementById('svDayEvents');if(!area)return;
+  if(!events.length){
+    area.innerHTML='<div class="no-events-msg"><i class="fas fa-calendar-day"></i> '+T('noEntries')+'</div>';
+  }else{
+    area.innerHTML=events.map((ev,i)=>'<div class="day-event-item'+(ev.done?' done':'')+'">'+
+      '<span class="dei-sticker">'+esc(ev.sticker||'📝')+'</span>'+
+      '<span class="dei-title">'+esc(ev.title)+'</span>'+
+      '<span class="dei-time">'+esc(ev.time||'')+'</span>'+
+      (ev.alarm?'<i class="fas fa-bell dei-alarm-ic" title="Alarm reminder set"></i>':'')+
+      '<span class="dei-done-toggle" title="Mark done / not done" onclick="toggleSchedDone(\''+key+'\','+i+')">'+(ev.done?'✅':'❌')+'</span>'+
+      '<button class="dei-del" onclick="deleteSchedEvent(\''+key+'\','+i+')"><i class="fas fa-trash"></i></button>'+
+    '</div>').join('');
+  }
+}
+function toggleSchedDone(key,i){
+  const evs=DB.get('events_'+key,[])||[];if(!evs[i])return;
+  evs[i].done=!evs[i].done;DB.set('events_'+key,evs);renderSchedDay();
+}
+function changeSchedDay(d){_schedDay=addDays(_schedDay,d);renderSchedDay();}
+function deleteSchedEvent(key,i){
+  const evs=DB.get('events_'+key,[])||[];evs.splice(i,1);DB.set('events_'+key,evs);
+  renderSchedDay();showToast('Entry deleted');
+}
+function renderSchedWeek(){
+  const start=new Date(_schedWeekStart),end=addDays(start,6);
+  const tEl=document.getElementById('svWeekTitle');
+  if(tEl)tEl.textContent=fmtDate(start,{month:'short',day:'numeric'})+' – '+fmtDate(end,{month:'short',day:'numeric',year:'numeric'});
+  const grid=document.getElementById('svWeekGrid');if(!grid)return;
+  const today=fmtKey(new Date());
+  let html='';
+  for(let i=0;i<7;i++){
+    const d=addDays(start,i),key=fmtKey(d),isToday=(key===today);
+    const eth=EthCal.gregToEth(d);
+    const label=_schedCalType==='eth'?eth.day:d.getDate();
+    const evs=DB.get('events_'+key,[])||[];
+    html+='<div class="wg-col"><div class="wg-day-hdr">'+ETH_DAYS_EN[d.getDay()]+'</div>'+
+      '<div class="wg-cell'+(isToday?' today':'')+'" onclick="openEntryModal(\''+key+'\')">'+
+      '<span class="wg-num">'+label+'</span>'+
+      evs.map(ev=>'<div class="wg-evt">'+esc(ev.sticker||'')+esc(ev.title)+'</div>').join('')+
+      '<button class="wg-add" onclick="event.stopPropagation();openEntryModal(\''+key+'\')"><i class="fas fa-plus"></i></button>'+
+      '</div></div>';
+  }
+  grid.innerHTML=html;
+}
+function changeSchedWeek(d){_schedWeekStart=addDays(_schedWeekStart,d*7);renderSchedWeek();}
+function renderSchedMonth(){
+  const yr=_schedMonthDate.getFullYear(),mo=_schedMonthDate.getMonth();
+  const tEl=document.getElementById('svMonthTitle');
+  if(tEl)tEl.textContent=_schedCalType==='eth'?(()=>{const e=EthCal.gregToEth(new Date(yr,mo,1));return e.monthName+' '+e.year+' E.C.';})():(GREG_MONTHS[mo]+' '+yr);
+  const firstDow=new Date(yr,mo,1).getDay(),daysInM=new Date(yr,mo+1,0).getDate(),todayKey=fmtKey(new Date());
+  const grid=document.getElementById('svMonthGrid');if(!grid)return;
+  let html=GREG_DAYS.map(d=>'<div class="mg-hdr">'+d+'</div>').join('');
+  for(let i=0;i<firstDow;i++)html+='<div class="mg-day other-month"></div>';
+  for(let d=1;d<=daysInM;d++){
+    const date=new Date(yr,mo,d),key=fmtKey(date),isToday=(key===todayKey);
+    const eth=EthCal.gregToEth(date),evs=DB.get('events_'+key,[])||[];
+    html+='<div class="mg-day'+(isToday?' today':'')+'">'+
+      '<span class="mg-num">'+d+'</span>'+
+      '<span class="mg-eth">'+eth.day+'</span>'+
+      (evs.length?'<div class="mg-dot"></div>':'')+
+      '<button class="mg-add" onclick="event.stopPropagation();openEntryModal(\''+key+'\')"><i class="fas fa-plus"></i></button>'+
+      '</div>';
+  }
+  grid.innerHTML=html;
+}
+function changeSchedMonth(d){_schedMonthDate=new Date(_schedMonthDate.getFullYear(),_schedMonthDate.getMonth()+d,1);renderSchedMonth();}
+
+/* ── 9. ALARM SOUND ENGINE ── */
+const ALARM_SOUNDS={
+  bell:{label:'🔔 Bell',notes:[784,659,523],type:'sine',dur:0.35,gap:0.12},
+  chime:{label:'🎵 Chime',notes:[1047,880,698],type:'sine',dur:0.5,gap:0.15},
+  digital:{label:'📳 Digital',notes:[880,880,880],type:'square',dur:0.1,gap:0.08},
+  gentle:{label:'🌸 Gentle',notes:[523,659,784],type:'sine',dur:0.6,gap:0.2},
+  alert:{label:'🚨 Alert',notes:[1320,1047,1320],type:'sawtooth',dur:0.15,gap:0.05},
+  church:{label:'⛪ Church Bell',notes:[392,330,262],type:'sine',dur:0.8,gap:0.25},
+  soft:{label:'💤 Soft Beep',notes:[660,660],type:'sine',dur:0.2,gap:0.3}
+};
+let _audioCtx=null,_customSoundUrl=null;
+
+function getAudioCtx(){
+  if(!_audioCtx||_audioCtx.state==='closed')_audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  if(_audioCtx.state==='suspended')_audioCtx.resume();
+  return _audioCtx;
+}
+function playAlarmSound(key,times){
+  times=times||3;
+  if(key==='custom'){playCustomSound(times);return;}
+  const def=ALARM_SOUNDS[key]||ALARM_SOUNDS.bell;
+  try{
+    const ctx=getAudioCtx();let t=ctx.currentTime+0.05;
+    for(let r=0;r<times;r++){
+      def.notes.forEach(f=>{
+        const osc=ctx.createOscillator(),gain=ctx.createGain();
+        osc.connect(gain);gain.connect(ctx.destination);
+        osc.type=def.type;osc.frequency.setValueAtTime(f,t);
+        gain.gain.setValueAtTime(0.45,t);
+        gain.gain.exponentialRampToValueAtTime(0.001,t+def.dur);
+        osc.start(t);osc.stop(t+def.dur+0.02);
+        t+=def.dur+def.gap;
+      });
+      t+=def.gap*2;
+    }
+  }catch(e){console.warn('Audio:',e);}
+}
+function playCustomSound(times){
+  const url=_customSoundUrl||DB.get('custom_sound_url');
+  if(!url){playAlarmSound('bell',times);return;}
+  const audio=new Audio(url);
+  audio.play().catch(()=>playAlarmSound('bell',1));
+}
+function previewAlarm(){
+  const sel=document.getElementById('emAlarmSound');
+  playAlarmSound(sel?sel.value:'bell',1);
+}
+function handleCustomSoundUpload(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    _customSoundUrl=e.target.result;
+    DB.set('custom_sound_url',e.target.result);
+    DB.set('custom_sound_name',file.name);
+    const lbl=document.getElementById('customSoundLabel');
+    if(lbl)lbl.textContent='✅ '+file.name;
+    showToast('Custom sound loaded: '+file.name);
+  };
+  reader.readAsDataURL(file);
+}
+function buildAlarmPickerHTML(){
+  const savedName=DB.get('custom_sound_name','');
+  const defaultSound=(DB.get('settings',{})||{}).defaultAlarmSound||'bell';
+  let opts=Object.entries(ALARM_SOUNDS).map(([k,v])=>'<option value="'+k+'"'+(k===defaultSound?' selected':'')+'>'+v.label+'</option>').join('');
+  opts+='<option value="custom">📁 Custom Upload</option>';
+  return '<div class="mfield" id="alarmSoundField">'+
+    '<label>'+T('alarmSound')+'</label>'+
+    '<div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">'+
+      '<select id="emAlarmSound" class="minput" style="flex:1">'+opts+'</select>'+
+      '<button type="button" class="preview-btn" onclick="previewAlarm()">▶ '+T('preview')+'</button>'+
+    '</div>'+
+    '<div style="margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+      '<label style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase">'+T('uploadSound')+'</label>'+
+      '<input type="file" id="customSoundInput" accept="audio/*" onchange="handleCustomSoundUpload(this)" style="font-size:.75rem;flex:1"/>'+
+    '</div>'+
+    '<span id="customSoundLabel" style="font-size:.72rem;color:var(--muted)">'+(savedName?'✅ '+savedName:T('noCustomSound'))+'</span>'+
+  '</div>';
+}
+
+/* ── 10. ALARM CHECKER (every 30s) ── */
+function startAlarmChecker(){checkAlarms();setInterval(checkAlarms,30000);}
+function checkAlarms(){
+  const now=new Date(),todayKey=fmtKey(now),nowTime=pad(now.getHours())+':'+pad(now.getMinutes());
+  // Check today
+  (DB.get('events_'+todayKey,[])||[]).forEach(ev=>{
+    if(ev.alarm&&ev.time&&ev.time===nowTime)tryFireAlarm(ev,todayKey);
+  });
+  // Check repeating events from past 31 days
+  for(let i=1;i<=31;i++){
+    const d=addDays(now,-i),key=fmtKey(d);
+    (DB.get('events_'+key,[])||[]).forEach(ev=>{
+      if(!ev.alarm||!ev.time||ev.time!==nowTime)return;
+      let fire=false;
+      if(ev.repeat==='daily')fire=true;
+      else if(ev.repeat==='weekly'&&d.getDay()===now.getDay())fire=true;
+      else if(ev.repeat==='custom'&&Array.isArray(ev.customDays)&&ev.customDays.map(Number).includes(now.getDay()))fire=true;
+      if(fire)tryFireAlarm(ev,todayKey);
+    });
+  }
+}
+function tryFireAlarm(ev,todayKey){
+  const k='afired_'+todayKey+'_'+(ev.time||'')+'_'+(ev.title||'').slice(0,15);
+  if(DB.get(k))return;DB.set(k,1);fireAlarm(ev);
+}
+function fireAlarm(ev){
+  playAlarmSound(ev.alarmSound||'bell',3);
+  showAlarmBanner(ev.sticker||'📝',ev.title,ev.time);
+  if('Notification' in window&&Notification.permission==='granted'){
+    new Notification('⏰ Ethio Planner',{body:(ev.sticker||'📝')+' '+(ev.title||'')+' at '+(ev.time||''),icon:''});
+  }
+}
+function showAlarmBanner(sticker,title,time){
+  let b=document.getElementById('alarmBanner');
+  if(!b){b=document.createElement('div');b.id='alarmBanner';b.className='alarm-banner';document.getElementById('app').appendChild(b);}
+  b.style.display='flex';
+  b.innerHTML='<span class="ab-icon">'+sticker+'</span>'+
+    '<div class="ab-info"><div class="ab-title">'+esc(title||'')+'</div><div class="ab-time">⏰ '+esc(time||'')+'</div></div>'+
+    '<button class="ab-snooze" onclick="snoozeAlarm(this)">⏱ '+T('snooze')+'</button>'+
+    '<button class="ab-close" onclick="this.closest(\'.alarm-banner\').style.display=\'none\'">✕ '+T('dismiss')+'</button>';
+  clearTimeout(b._t);b._t=setTimeout(()=>b.style.display='none',20000);
+}
+function snoozeAlarm(btn){
+  const b=btn.closest('.alarm-banner');if(b)b.style.display='none';
+  showToast('⏱ Snoozed 5 minutes');
+  setTimeout(()=>{const b2=document.getElementById('alarmBanner');if(b2)b2.style.display='flex';playAlarmSound('gentle',2);},5*60*1000);
+}
+function requestNotifPermission(){if('Notification' in window&&Notification.permission==='default')Notification.requestPermission();}
+
+/* ── 11. ENTRY MODAL ── */
+let _entryTargetKey=null,_pickedSticker='📝';
+function openEntryModal(dateKey){
+  _entryTargetKey=dateKey||fmtKey(_schedDay);
+  const f=(id,val)=>{const el=document.getElementById(id);if(el&&val!==undefined)el.value=val;};
+  f('emDate',_entryTargetKey);f('emTitle','');f('emTime','');f('emRepeat','never');f('emCalType','gregorian');
+  const al=document.getElementById('emAlarm');if(al)al.checked=false;
+  const cdf=document.getElementById('emCustomDaysField');if(cdf)cdf.style.display='none';
+  document.querySelectorAll('.sticker-opt').forEach(s=>s.classList.remove('selected'));
+  const sc=document.getElementById('emStickerCustom');if(sc)sc.value='';
+  _pickedSticker='📝';
+  // Inject alarm sound picker once
+  const body=document.querySelector('#entryModalOverlay .modal-body');
+  if(body&&!document.getElementById('alarmSoundField')){
+    const tmp=document.createElement('div');tmp.innerHTML=buildAlarmPickerHTML();
+    const alarmRow=(document.getElementById('emAlarm')||{closest:()=>null}).closest&&document.getElementById('emAlarm')&&document.getElementById('emAlarm').closest('.mfield');
+    if(alarmRow&&alarmRow.nextSibling)body.insertBefore(tmp.firstElementChild,alarmRow.nextSibling);
+    else if(body)body.appendChild(tmp.firstElementChild);
+  }
+  const sel=document.getElementById('emAlarmSound');if(sel)sel.value=DB.get('last_alarm_sound','bell');
+  const lbl=document.getElementById('customSoundLabel');
+  if(lbl){const nm=DB.get('custom_sound_name','');lbl.textContent=nm?'✅ '+nm:T('noCustomSound');}
+  document.getElementById('entryModalOverlay').style.display='flex';
+}
+function closeEntryModal(){document.getElementById('entryModalOverlay').style.display='none';}
+function pickSticker(el,emoji){
+  document.querySelectorAll('.sticker-opt').forEach(s=>s.classList.remove('selected'));
+  el.classList.add('selected');_pickedSticker=emoji;
+  const sc=document.getElementById('emStickerCustom');if(sc)sc.value=emoji;
+}
+function toggleCustomDays(){
+  const v=(document.getElementById('emRepeat')||{}).value;
+  const f=document.getElementById('emCustomDaysField');if(f)f.style.display=v==='custom'?'flex':'none';
+}
+function saveEntry(){
+  const titleEl=document.getElementById('emTitle');
+  const title=(titleEl?titleEl.value:'').trim();
+  if(!title){showToast(T('enterTitle'));return;}
+  const sc=document.getElementById('emStickerCustom');
+  const sticker=(sc?sc.value:'')||_pickedSticker||'📝';
+  const dateEl=document.getElementById('emDate');
+  const key=(dateEl?dateEl.value:'')||fmtKey(new Date());
+  const timeEl=document.getElementById('emTime');
+  const alarmEl=document.getElementById('emAlarm');
+  const soundEl=document.getElementById('emAlarmSound');
+  const repeatEl=document.getElementById('emRepeat');
+  const calEl=document.getElementById('emCalType');
+  const soundVal=soundEl?soundEl.value:'bell';
+  DB.set('last_alarm_sound',soundVal);
+  const entry={
+    title,sticker,
+    time:timeEl?timeEl.value:'',
+    alarm:alarmEl?alarmEl.checked:false,
+    alarmSound:soundVal,
+    repeat:repeatEl?repeatEl.value:'never',
+    calType:calEl?calEl.value:'gregorian',
+    customDays:[...document.querySelectorAll('input[name="emd"]:checked')].map(c=>c.value),
+    created:new Date().toISOString()
+  };
+  const evs=DB.get('events_'+key,[])||[];evs.push(entry);DB.set('events_'+key,evs);
+  closeEntryModal();
+  showToast(T('entrySaved')+' '+sticker);
+  renderSchedDay();renderSchedWeek();renderSchedMonth();
+  if(_calPageInited){renderCalGrid('eth');renderCalGrid('greg');}
+  updateNotifBadge();
+}
+
+/* ── 12. PLANNER DESIGNER ── */
+let _currentPlannerView='daily',_dpDate=fmtKey(new Date()),_mpYear=new Date().getFullYear(),_mpMonth=new Date().getMonth();
+
+function initPlannerDesigner(){
+  switchPlannerView('daily');setDpDate(_dpDate);
+  buildDpScheduleTable();buildWpScheduleTable();buildMpCalGrid();setWeeklyLabel();renderMyFiles();
+}
+function switchPlannerView(view){
+  _currentPlannerView=view;
+  document.querySelectorAll('.pv').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById('pv-'+view);if(el)el.classList.add('active');
+  document.querySelectorAll('.vtab[data-pv]').forEach(b=>b.classList.toggle('active',b.dataset.pv===view));
+  if(view==='myfiles')renderMyFiles();
+}
+function setDpDate(key){
+  _dpDate=key;const d=new Date(key+'T12:00:00'),eth=EthCal.gregToEth(d);
+  const lbl=document.getElementById('pDailyDateLabel');
+  if(lbl)lbl.textContent=fmtDate(d,{weekday:'long',month:'long',day:'numeric',year:'numeric'})+' | '+eth.monthName+' '+eth.day+', '+eth.year+' E.C.';
+  const pk=document.getElementById('pDailyDatePicker');if(pk)pk.value=key;
+  loadDailyPlannerData(key);
+}
+function changeDailyPlannerDate(val){setDpDate(val||fmtKey(new Date()));}
+function loadDailyPlannerData(key){
+  const data=DB.get('dp_'+key,{})||{};
+  loadPbList('dp-goals',data.goals||[],'goal');
+  loadPbList('dp-todo',data.todo||[],'todo');
+  loadPbList('dp-tomorrow',data.tomorrow||[],'tomorrow');
+  const dn=document.getElementById('dp-notes');if(dn)dn.value=data.notes||'';
+  buildDpScheduleTable(data.schedule||[]);
+}
+/* Default daily schedule: hourly rows from 1:00 to 12:00 — fully editable & extendable */
+function defaultDpScheduleRows(){
+  const rows=[];for(let h=1;h<=12;h++)rows.push({time:h+':00',activity:'',alarm:false,done:false});
+  return rows;
+}
+function buildDpScheduleTable(savedRows){
+  const rows=(savedRows&&savedRows.length)?savedRows:defaultDpScheduleRows();
+  let html='<table class="sched-table"><thead><tr><th>Time</th><th>Activity</th><th title="Alarm"><i class="fas fa-bell"></i></th><th title="Done">✅</th><th></th></tr></thead><tbody>';
+  html+=rows.map((r,i)=>'<tr>'+
+    '<td class="time-cell"><input type="text" class="sched-time-input" value="'+esc(r.time||'')+'" placeholder="e.g. 1:00" oninput="saveDpRow('+i+',\'time\',this.value)"/></td>'+
+    '<td><input type="text" value="'+esc(r.activity||'')+'" placeholder="..." oninput="saveDpRow('+i+',\'activity\',this.value)"/></td>'+
+    '<td><span class="sched-alarm-toggle'+(r.alarm?' on':'')+'" onclick="toggleDpRowFlag('+i+',\'alarm\')" title="Alarm reminder"><i class="fas fa-bell"></i></span></td>'+
+    '<td><span class="sched-done-toggle" onclick="toggleDpRowFlag('+i+',\'done\')" title="Done?">'+(r.done?'✅':'❌')+'</span></td>'+
+    '<td><button class="sched-row-del" onclick="deleteDpRow('+i+')" title="Remove row"><i class="fas fa-times"></i></button></td>'+
+  '</tr>').join('');
+  html+='</tbody></table><button class="sched-add-row-btn" onclick="addDpRow()"><i class="fas fa-plus"></i> Add Row</button>';
+  const el=document.getElementById('dp-schedule');if(el)el.innerHTML=html;
+}
+function saveDpRow(i,field,val){
+  const data=DB.get('dp_'+_dpDate,{})||{};
+  if(!data.schedule||!data.schedule.length)data.schedule=defaultDpScheduleRows();
+  if(!data.schedule[i])return;
+  data.schedule[i][field]=val;DB.set('dp_'+_dpDate,data);
+}
+function toggleDpRowFlag(i,field){
+  const data=DB.get('dp_'+_dpDate,{})||{};
+  if(!data.schedule||!data.schedule.length)data.schedule=defaultDpScheduleRows();
+  if(!data.schedule[i])return;
+  data.schedule[i][field]=!data.schedule[i][field];DB.set('dp_'+_dpDate,data);
+  buildDpScheduleTable(data.schedule);
+}
+function addDpRow(){
+  const data=DB.get('dp_'+_dpDate,{})||{};
+  if(!data.schedule||!data.schedule.length)data.schedule=defaultDpScheduleRows();
+  data.schedule.push({time:'',activity:'',alarm:false,done:false});
+  DB.set('dp_'+_dpDate,data);
+  buildDpScheduleTable(data.schedule);
+}
+function deleteDpRow(i){
+  const data=DB.get('dp_'+_dpDate,{})||{};
+  if(!data.schedule||!data.schedule.length)data.schedule=defaultDpScheduleRows();
+  data.schedule.splice(i,1);DB.set('dp_'+_dpDate,data);
+  buildDpScheduleTable(data.schedule);
+}
+function setWeeklyLabel(){
+  const ws=weekStart(new Date()),we=addDays(ws,6);
+  const lbl=document.getElementById('pWeeklyLabel');
+  if(lbl)lbl.textContent=T('weekly')+': '+fmtDate(ws,{month:'short',day:'numeric'})+' – '+fmtDate(we,{month:'short',day:'numeric',year:'numeric'});
+}
+function buildWpScheduleTable(){
+  const days=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  const times=[];for(let h=5;h<=22;h++)times.push(h+':00–'+(h+1)+':00');
+  const saved=DB.get('wp_schedule',{})||{};
+  let html='<table class="weekly-sched-table"><thead><tr><th>TIME</th>'+days.map(d=>'<th>'+d+'</th>').join('')+'</tr></thead><tbody>';
+  html+=times.map(tm=>'<tr><td class="wst-time">'+tm+'</td>'+
+    days.map(d=>'<td><input type="text" value="'+esc((saved[tm]&&saved[tm][d])||'')+'" oninput="saveWpCell(\''+tm+'\',\''+d+'\',this.value)"/></td>').join('')+
+  '</tr>').join('');
+  html+='</tbody></table>';
+  const el=document.getElementById('wp-schedule-wrap');if(el)el.innerHTML=html;
+}
+function saveWpCell(tm,d,v){
+  const s=DB.get('wp_schedule',{})||{};if(!s[tm])s[tm]={};s[tm][d]=v;DB.set('wp_schedule',s);
+}
+function changeMonthlyPlan(d){
+  _mpMonth+=d;
+  if(_mpMonth>11){_mpMonth=0;_mpYear++;}
+  if(_mpMonth<0){_mpMonth=11;_mpYear--;}
+  buildMpCalGrid();
+}
+function buildMpCalGrid(){
+  const lbl=document.getElementById('pMonthlyLabel');if(lbl)lbl.textContent=GREG_MONTHS[_mpMonth]+' '+_mpYear;
+  const firstDow=new Date(_mpYear,_mpMonth,1).getDay(),daysInM=new Date(_mpYear,_mpMonth+1,0).getDate(),todayKey=fmtKey(new Date());
+  const days=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  let html='<table class="mp-cal"><thead><tr>'+days.map(d=>'<th>'+d+'</th>').join('')+'</tr></thead><tbody><tr>';
+  const off=(firstDow+6)%7;
+  for(let i=0;i<off;i++)html+='<td></td>';
+  let col=off;
+  for(let d=1;d<=daysInM;d++){
+    if(col===7){html+='</tr><tr>';col=0;}
+    const date=new Date(_mpYear,_mpMonth,d),key=fmtKey(date),isToday=(key===todayKey);
+    const evs=DB.get('events_'+key,[])||[];
+    html+='<td class="'+(isToday?'today':'')+'"><span class="mp-day-n">'+d+'</span>'+
+      evs.map(ev=>'<div class="mp-day-evt">'+esc(ev.sticker||'')+esc(ev.title)+'</div>').join('')+
+      '<button class="mp-day-add" onclick="event.stopPropagation();openEntryModal(\''+key+'\')"><i class="fas fa-plus"></i></button></td>';
+    col++;
+  }
+  while(col<7&&col>0){html+='<td></td>';col++;}
+  html+='</tr></tbody></table>';
+  const el=document.getElementById('mp-cal-grid');if(el)el.innerHTML=html;
+}
+function pbAdd(cid,type){
+  const c=document.getElementById(cid);if(!c)return;
+  const div=document.createElement('div');div.className='pb-item';div.dataset.type=type;
+  let icon='';
+  if(type==='todo')icon='<input type="checkbox" onchange="this.closest(\'.pb-item\').classList.toggle(\'done\',this.checked)"/>';
+  else if(type==='goal')icon='<span style="color:var(--pri);flex-shrink:0">🎯</span>';
+  else if(type==='priority'){const n=c.children.length+1;icon='<span class="pri-num">'+n+'</span>';}
+  else icon='<span style="color:var(--acc);flex-shrink:0">→</span>';
+  div.innerHTML=icon+'<input type="text" class="pbi-text" placeholder="..."/>'+
+    '<span class="pbi-alarm" onclick="this.classList.toggle(\'on\')" title="Toggle alarm reminder"><i class="fas fa-bell"></i></span>'+
+    '<button class="pbi-del" onclick="this.closest(\'.pb-item\').remove()"><i class="fas fa-times"></i></button>';
+  c.appendChild(div);
+}
+function loadPbList(cid,items,type){
+  const c=document.getElementById(cid);if(!c)return;c.innerHTML='';
+  (items||[]).forEach(item=>{
+    const div=document.createElement('div');div.className='pb-item'+(item.done?' done':'');div.dataset.type=type;
+    let icon='';
+    if(type==='todo')icon='<input type="checkbox"'+(item.done?' checked':'')+' onchange="this.closest(\'.pb-item\').classList.toggle(\'done\',this.checked)"/>';
+    else if(type==='goal')icon='<span style="color:var(--pri);flex-shrink:0">🎯</span>';
+    else icon='<span style="color:var(--acc);flex-shrink:0">→</span>';
+    div.innerHTML=icon+'<input type="text" class="pbi-text" value="'+esc(item.text||'')+'"/>'+
+      '<span class="pbi-alarm'+(item.reminder?' on':'')+'" onclick="this.classList.toggle(\'on\')" title="Toggle alarm reminder"><i class="fas fa-bell"></i></span>'+
+      '<button class="pbi-del" onclick="this.closest(\'.pb-item\').remove()"><i class="fas fa-times"></i></button>';
+    c.appendChild(div);
+  });
+}
+function getPbItems(cid){
+  return [...document.querySelectorAll('#'+cid+' .pb-item')].map(el=>({
+    text:(el.querySelector('.pbi-text')||{}).value||'',done:el.classList.contains('done'),
+    reminder:(el.querySelector('.pbi-alarm')||{}).classList?el.querySelector('.pbi-alarm').classList.contains('on'):false
+  }));
+}
+function saveDailyPlanner(){
+  const data={goals:getPbItems('dp-goals'),todo:getPbItems('dp-todo'),tomorrow:getPbItems('dp-tomorrow'),
+    notes:(document.getElementById('dp-notes')||{}).value||'',savedAt:new Date().toISOString()};
+  DB.set('dp_'+_dpDate,{...DB.get('dp_'+_dpDate,{})||{},...data});
+  saveToMyFiles('daily',_dpDate,data);showToast(T('planSaved')+' 📋');
+}
+function saveWeeklyPlanner(){
+  const ws=weekStart(new Date()),key='wp_'+fmtKey(ws);
+  const data={goals:getPbItems('wp-goals'),priorities:getPbItems('wp-priorities'),todo:getPbItems('wp-todo'),savedAt:new Date().toISOString()};
+  DB.set(key,data);saveToMyFiles('weekly',fmtKey(ws),data);showToast(T('planSaved')+' 📅');
+}
+function saveMonthlyPlanner(){
+  const key='mp_'+_mpYear+'_'+pad(_mpMonth+1);
+  const data={year:_mpYear,month:_mpMonth,savedAt:new Date().toISOString()};
+  DB.set(key,data);saveToMyFiles('monthly',GREG_MONTHS[_mpMonth]+' '+_mpYear,data);showToast(T('planSaved')+' 🗓️');
+}
+function saveToMyFiles(type,dateLabel,data){
+  const files=DB.get('my_files',[])||[];
+  const preview=(data.goals&&data.goals[0])?data.goals[0].text:'';
+  files.unshift({id:Date.now(),type,dateLabel,preview,pinned:false,savedAt:new Date().toISOString()});
+  DB.set('my_files',files.slice(0,50));
+}
+function renderMyFiles(){
+  const files=DB.get('my_files',[])||[];
+  const el=document.getElementById('myfiles-list');if(!el)return;
+  if(!files.length){el.innerHTML='<div style="color:var(--muted);font-size:.82rem;padding:10px">'+T('savedPlans')+': '+T('noEntries')+'</div>';return;}
+  const sorted=[...files].sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0));
+  el.innerHTML=sorted.map(f=>'<div class="mf-item'+(f.pinned?' pinned':'')+'">'+
+    '<div class="mf-info">'+
+      '<div class="mf-type">'+(f.type==='daily'?'📋 '+T('daily'):f.type==='weekly'?'📅 '+T('weekly'):'🗓️ '+T('monthly'))+'</div>'+
+      '<div class="mf-date">'+esc(f.dateLabel)+'</div>'+
+      (f.preview?'<div class="mf-preview">'+esc(f.preview)+'</div>':'')+
+      '<div style="font-size:.68rem;color:var(--muted)">'+new Date(f.savedAt).toLocaleDateString()+'</div>'+
+    '</div>'+
+    '<div class="mf-actions">'+
+      '<button class="mf-btn'+(f.pinned?' pin-active':'')+'" onclick="togglePinFile('+f.id+')" title="Pin">📌</button>'+
+      '<button class="mf-btn del-btn" onclick="deleteFile('+f.id+')" title="Delete"><i class="fas fa-trash"></i></button>'+
+    '</div></div>').join('');
+}
+function togglePinFile(id){const files=DB.get('my_files',[])||[],f=files.find(x=>x.id===id);if(f){f.pinned=!f.pinned;DB.set('my_files',files);renderMyFiles();}}
+function deleteFile(id){DB.set('my_files',(DB.get('my_files',[])||[]).filter(x=>x.id!==id));renderMyFiles();showToast('File deleted');}
+
+/* ── 13. PERIOD TRACKER ── */
+const FLOW_CYCLE=['','flow-light','flow-medium','flow-heavy','flow-ovulation'];
+const PAIN_CYCLE=['','⚡','⚡⚡','⚡⚡⚡'];
+const MONTH_COLORS=['#ffd6e0','#fde2cc','#fff4cc','#d6f5d6','#cce5ff','#e8d6ff','#ffd6e0','#fde2cc','#d6f5d6','#ffd6cc','#d6eeff','#e8d6ff'];
+
+function initPeriodTracker(){
+  const yr=new Date().getFullYear();
+  const yl=document.getElementById('ptYearLabel');if(yl)yl.textContent=yr;
+  buildTrackerTable(yr);buildCycleLenTable();buildNotesTable();renderCycleHistory();
+  const url=DB.get('custom_sound_url');if(url)_customSoundUrl=url;
+}
+function buildTrackerTable(year){
+  let html='<thead><tr><th class="day-hdr">Day</th>';
+  GREG_MONTHS_S.forEach((m,mi)=>{html+='<th class="month-hdr" style="background:'+MONTH_COLORS[mi]+'">'+m+'</th>';});
+  html+='</tr></thead><tbody>';
+  for(let day=1;day<=31;day++){
+    html+='<tr><td class="day-num-cell">'+day+'</td>';
+    for(let m=0;m<12;m++){
+      const k='pt_cell_'+year+'_'+pad(m+1)+'_'+pad(day);
+      const sv=DB.get(k,{})||{};
+      html+='<td class="'+(sv.flow||'')+'" onclick="cyclePtCell(this,'+year+','+(m+1)+','+day+')" oncontextmenu="event.preventDefault();cyclePtPain(this,'+year+','+(m+1)+','+day+')">'+
+        '<span style="font-size:.55rem">'+(sv.pain||'')+'</span></td>';
+    }
+    html+='</tr>';
+  }
+  html+='</tbody>';
+  const el=document.getElementById('ptTrackerTable');if(el)el.innerHTML=html;
+}
+function cyclePtCell(td,year,month,day){
+  const k='pt_cell_'+year+'_'+pad(month)+'_'+pad(day),sv=DB.get(k,{})||{};
+  const next=FLOW_CYCLE[(FLOW_CYCLE.indexOf(sv.flow||'')+1)%FLOW_CYCLE.length];
+  FLOW_CYCLE.filter(Boolean).forEach(c=>td.classList.remove(c));
+  if(next)td.classList.add(next);sv.flow=next;DB.set(k,sv);
+}
+function cyclePtPain(td,year,month,day){
+  const k='pt_cell_'+year+'_'+pad(month)+'_'+pad(day),sv=DB.get(k,{})||{};
+  const next=PAIN_CYCLE[(PAIN_CYCLE.indexOf(sv.pain||'')+1)%PAIN_CYCLE.length];
+  sv.pain=next;DB.set(k,sv);
+  const sp=td.querySelector('span');if(sp)sp.textContent=next||'';
+}
+function buildCycleLenTable(){
+  const hist=DB.get('pt_history',[])||[];
+  let html='<thead><tr><th>Month</th><th>Start</th><th>End</th><th>Length</th></tr></thead><tbody>';
+  if(!hist.length)html+='<tr><td colspan="4" style="text-align:center;color:var(--muted)">'+T('noEntries')+'</td></tr>';
+  else hist.slice(0,12).forEach(h=>{html+='<tr><td>'+esc(h.month||'—')+'</td><td>'+esc(h.start||'—')+'</td><td>'+esc(h.end||'—')+'</td><td>'+(h.length?h.length+' days':'—')+'</td></tr>';});
+  html+='</tbody>';
+  const el=document.getElementById('ptCycleLenTable');if(el)el.innerHTML=html;
+}
+function buildNotesTable(){
+  const notes=DB.get('pt_notes',{})||{};
+  let html='<thead><tr><th>Month</th><th>Notes</th></tr></thead><tbody>';
+  GREG_MONTHS.forEach((m,i)=>{
+    html+='<tr><td style="background:'+MONTH_COLORS[i]+';font-weight:700;color:#333;padding:4px 7px;font-size:.75rem;white-space:nowrap">'+GREG_MONTHS_S[i]+'</td>'+
+      '<td><textarea oninput="savePtNote('+(i+1)+',this.value)" placeholder="Notes for '+m+'...">'+esc(notes[String(i+1)]||'')+'</textarea></td></tr>';
+  });
+  html+='</tbody>';
+  const el=document.getElementById('ptNotesTable');if(el)el.innerHTML=html;
+}
+function savePtNote(m,v){const n=DB.get('pt_notes',{})||{};n[String(m)]=v;DB.set('pt_notes',n);}
+function logCycle(){
+  const sv=document.getElementById('ptStartDate'),ev=document.getElementById('ptEndDate'),lv=document.getElementById('ptCycleLen');
+  const start=sv?sv.value:'',end=ev?ev.value:'',len=parseInt(lv?lv.value:28)||28;
+  if(!start){showToast('Please enter a start date');return;}
+  const startD=new Date(start+'T12:00:00');
+  const predRow=document.getElementById('ptPredictionRow');if(predRow)predRow.style.display='grid';
+  const fdEl=document.getElementById('ptFlowDur');
+  if(end&&fdEl){const ed=new Date(end+'T12:00:00');fdEl.textContent=Math.round((ed-startD)/86400000)+1+' days';}
+  else if(fdEl)fdEl.textContent='—';
+  const nextD=addDays(startD,len),alertD=addDays(nextD,-1),ovulD=addDays(nextD,-14);
+  const nd=document.getElementById('ptNextDate');if(nd)nd.textContent=fmtDate(nextD,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  const ad=document.getElementById('ptAlertDate');if(ad)ad.textContent=fmtDate(alertD,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  const od=document.getElementById('ptOvulDate');if(od)od.textContent=fmtDate(ovulD,{weekday:'short',month:'short',day:'numeric'});
+  schedPeriodNotif(alertD,'🌸 '+T('reminder1day')+': cycle expected tomorrow!');
+  const hist=DB.get('pt_history',[])||[];
+  hist.unshift({start,end:end||'—',length:len,next:fmtKey(nextD),month:GREG_MONTHS[startD.getMonth()],savedAt:new Date().toISOString()});
+  DB.set('pt_history',hist.slice(0,24));
+  renderCycleHistory();buildCycleLenTable();
+  showToast(T('logBtn')+' ✅ Next: '+fmtKey(nextD));
+}
+function renderCycleHistory(){
+  const hist=DB.get('pt_history',[])||[];
+  const el=document.getElementById('ptHistoryList');if(!el)return;
+  if(!hist.length){el.innerHTML='<div style="color:var(--muted);font-size:.78rem">No history yet.</div>';return;}
+  el.innerHTML=hist.slice(0,6).map(h=>'<div class="pt-hist-item"><span>🩸 <b>'+esc(h.start)+'</b></span><span>→ <b>'+esc(h.end)+'</b></span><span><b>'+h.length+' days</b></span><span>Next: <b>'+esc(h.next)+'</b></span></div>').join('');
+}
+function schedPeriodNotif(date,msg){
+  if(!('Notification' in window))return;
+  const diff=new Date(date).setHours(8,0,0,0)-Date.now();
+  if(diff<0)return;
+  Notification.requestPermission().then(p=>{if(p==='granted')setTimeout(()=>new Notification('Ethio Planner 🌸',{body:msg,icon:''}),Math.min(diff,2147483647));});
+}
+
+/* ── 14. CALENDAR PAGE ── */
+let _calPageInited=false,_calType='eth',_ethY,_ethM,_gregY,_gregM;
+function initCalendarPage(){
+  if(_calPageInited)return;_calPageInited=true;
+  const today=new Date(),eth=EthCal.gregToEth(today);
+  _ethY=eth.year;_ethM=eth.month;_gregY=today.getFullYear();_gregM=today.getMonth();
+  calSwitchType('eth');renderAllHolidays();initConverter();
+}
+function calSwitchType(type){
+  _calType=type;
+  ['eth','greg','both'].forEach(t=>{const b=document.getElementById('calBtn-'+t);if(b)b.classList.toggle('active',t===type);});
+  const row=document.getElementById('calPanelsRow');
+  const pe=document.getElementById('calPanel-eth'),pg=document.getElementById('calPanel-greg');
+  if(type==='both'){if(row)row.classList.add('two-cols');if(pe)pe.style.display='block';if(pg)pg.style.display='block';}
+  else if(type==='eth'){if(row)row.classList.remove('two-cols');if(pe)pe.style.display='block';if(pg)pg.style.display='none';}
+  else{if(row)row.classList.remove('two-cols');if(pe)pe.style.display='none';if(pg)pg.style.display='block';}
+  renderCalGrid('eth');renderCalGrid('greg');
+}
+function calNavMonth(type,d){
+  if(type==='eth'){_ethM+=d;if(_ethM>13){_ethM=1;_ethY++;}if(_ethM<1){_ethM=13;_ethY--;}}
+  else{_gregM+=d;if(_gregM>11){_gregM=0;_gregY++;}if(_gregM<0){_gregM=11;_gregY--;}}
+  renderCalGrid(type);
+}
+function renderCalGrid(type){
+  const today=new Date(),todayKey=fmtKey(today);
+  if(type==='eth'){
+    const tEl=document.getElementById('calTitle-eth');
+    if(tEl)tEl.textContent=ETH_MONTHS[_ethM-1]+' '+_ethY+' E.C. ('+ETH_MONTHS_EN[_ethM-1]+')';
+    const daysInM=EthCal.ethDaysInMonth(_ethY,_ethM),firstDow=EthCal.ethMonthStartDow(_ethY,_ethM);
+    const todayEth=EthCal.gregToEth(today);
+    let html=GREG_DAYS.map(d=>'<div class="cfg-hdr">'+d+'</div>').join('');
+    for(let i=0;i<firstDow;i++)html+='<div class="cfg-day other-month"></div>';
+    for(let d=1;d<=daysInM;d++){
+      const gDate=EthCal.ethToGreg(_ethY,_ethM,d),key=fmtKey(gDate);
+      const isToday=todayEth.year===_ethY&&todayEth.month===_ethM&&todayEth.day===d;
+      const feast=YEARLY_FEASTS.find(f=>f.ethM===_ethM&&f.day===d);
+      const hasEvt=(DB.get('events_'+key,[])||[]).length>0;
+      const ttip=feast?feast.en:(ORTHODOX_DAYS[d-1]?ORTHODOX_DAYS[d-1].en:'');
+      html+='<div class="cfg-day'+(isToday?' today':'')+(feast?' holiday':'')+(hasEvt?' has-event':'')+'" onclick="openEntryModal(\''+key+'\')" title="'+esc(ttip)+'">'+
+        '<span class="cfg-num">'+d+'</span><span class="cfg-eth">'+geezNum(d)+'</span></div>';
+    }
+    const grid=document.getElementById('calGrid-eth');if(grid)grid.innerHTML=html;
+  }else{
+    const tEl=document.getElementById('calTitle-greg');
+    if(tEl)tEl.textContent=GREG_MONTHS[_gregM]+' '+_gregY;
+    const firstDow=new Date(_gregY,_gregM,1).getDay(),daysInM=new Date(_gregY,_gregM+1,0).getDate();
+    const prevDays=new Date(_gregY,_gregM,0).getDate();
+    let html=GREG_DAYS.map(d=>'<div class="cfg-hdr">'+d+'</div>').join('');
+    for(let i=firstDow-1;i>=0;i--)html+='<div class="cfg-day other-month"><span class="cfg-num">'+(prevDays-i)+'</span></div>';
+    for(let d=1;d<=daysInM;d++){
+      const date=new Date(_gregY,_gregM,d),key=fmtKey(date),isToday=(key===todayKey);
+      const eth=EthCal.gregToEth(date);
+      const isHol=PUBLIC_HOLIDAYS.find(h=>h.date===(pad(_gregM+1)+'-'+pad(d)));
+      const hasEvt=(DB.get('events_'+key,[])||[]).length>0;
+      html+='<div class="cfg-day'+(isToday?' today':'')+(isHol?' holiday':'')+(hasEvt?' has-event':'')+'" onclick="openEntryModal(\''+key+'\')" title="'+esc(isHol?isHol.en:'')+'" >'+
+        '<span class="cfg-num">'+d+'</span><span class="cfg-eth">'+eth.day+'</span></div>';
+    }
+    const grid=document.getElementById('calGrid-greg');if(grid)grid.innerHTML=html;
+  }
+}
+
+/* ── DATE CONVERTER ── */
+function initConverter(){
+  const sel=document.getElementById('convEthMonth');
+  if(sel&&!sel.dataset.built){
+    sel.innerHTML=ETH_MONTHS.map((m,i)=>'<option value="'+(i+1)+'">'+m+' / '+ETH_MONTHS_EN[i]+'</option>').join('');
+    sel.dataset.built='1';
+  }
+  const today=new Date(),eth=EthCal.gregToEth(today);
+  const dEl=document.getElementById('convEthDay'),yEl=document.getElementById('convEthYear'),gEl=document.getElementById('convGregDate');
+  if(sel&&!sel.value)sel.value=eth.month;
+  if(dEl&&!dEl.value)dEl.value=eth.day;
+  if(yEl&&!yEl.value)yEl.value=eth.year;
+  if(gEl&&!gEl.value)gEl.value=fmtKey(today);
+}
+function convertEthToGreg(){
+  const m=parseInt(document.getElementById('convEthMonth').value,10);
+  const d=parseInt(document.getElementById('convEthDay').value,10);
+  const y=parseInt(document.getElementById('convEthYear').value,10);
+  const out=document.getElementById('convEthResult');
+  if(!m||!d||!y){out.textContent='Please enter a valid Ethiopian date.';return;}
+  const maxD=EthCal.ethDaysInMonth(y,m);
+  if(d<1||d>maxD){out.textContent='Invalid day — '+ETH_MONTHS_EN[m-1]+' '+y+' has '+maxD+' days.';return;}
+  const g=EthCal.ethToGreg(y,m,d);
+  out.innerHTML=fmtDate(g,{weekday:'long',month:'long',day:'numeric',year:'numeric'})+
+    '<span class="conv-sub">'+ETH_MONTHS[m-1]+' ('+ETH_MONTHS_EN[m-1]+') '+d+', '+y+' E.C.</span>';
+}
+function convertGregToEth(){
+  const val=document.getElementById('convGregDate').value;
+  const out=document.getElementById('convGregResult');
+  if(!val){out.textContent='Please pick a Gregorian date.';return;}
+  const g=new Date(val+'T12:00:00'),eth=EthCal.gregToEth(g);
+  out.innerHTML=eth.monthName+' ('+eth.monthNameEn+') '+eth.day+', '+eth.year+' E.C.'+
+    '<span class="conv-sub">'+fmtDate(g,{weekday:'long',month:'long',day:'numeric',year:'numeric'})+'</span>';
+}
+
+/* ── HOLIDAYS ── */
+let _curHTab='public',_curHPhotoKey='';
+let _holYear=null; // Ethiopian year currently shown in the Public holiday table
+function switchHTab(tab){
+  _curHTab=tab;
+  document.querySelectorAll('.htab').forEach(b=>b.classList.toggle('active',b.dataset.ht===tab));
+  document.querySelectorAll('.hview').forEach(v=>v.classList.remove('active'));
+  const el=document.getElementById('hv-'+tab);if(el)el.classList.add('active');
+}
+function renderAllHolidays(){renderPublicHols();renderOrthodoxHols();renderMuslimHols();renderDayNames();renderYearlyFeasts();}
+function changeHolYear(delta){
+  if(_holYear===null)_holYear=EthCal.gregToEth(new Date()).year;
+  _holYear+=delta;renderPublicHols();
+}
+function renderPublicHols(){
+  const el=document.getElementById('hlist-public');if(!el)return;
+  if(_holYear===null)_holYear=EthCal.gregToEth(new Date()).year;
+  const langKey=(_lang==='om')?'or':_lang; // language selector uses 'or' code for Afaan Oromo internally
+  const rows=PUBLIC_HOLIDAYS_TABLE.map(h=>{
+    const {g,eth}=computeHolidayOccurrence(h,_holYear);
+    return {h,g,eth};
+  }).sort((a,b)=>a.g-b.g);
+  const yearNav='<div class="ph-year-nav">'+
+      '<button class="nav-arrow" onclick="changeHolYear(-1)"><i class="fas fa-chevron-left"></i></button>'+
+      '<span class="ph-year-label">'+_holYear+' E.C.</span>'+
+      '<button class="nav-arrow" onclick="changeHolYear(1)"><i class="fas fa-chevron-right"></i></button>'+
+    '</div>';
+  const rowsHtml=rows.map(({h,g,eth})=>{
+    const dow=fmtDate(g,{weekday:'short'});
+    const gStr=fmtDate(g,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+    const ethStr=dow+', '+ETH_MONTHS_EN[eth.month-1]+' '+eth.day+', '+_holYear;
+    const nm=h.names[langKey]||h.names.en;
+    const otherLangs=['en','am','or','ti'].filter(l=>l!==langKey).map(l=>h.names[l]).join(' · ');
+    return '<div class="ph-row">'+
+      '<div class="ph-daynum">'+String(eth.day).padStart(2,'0')+'</div>'+
+      '<div class="ph-bar"></div>'+
+      '<div class="ph-main">'+
+        '<div class="ph-name-row"><span class="ph-name">'+esc(nm)+'</span>'+(h.dayOff?'<span class="ph-dayoff">Day-off</span>':'')+'</div>'+
+        '<div class="ph-name-alt">'+esc(otherLangs)+'</div>'+
+        '<div class="ph-date-row"><span>'+esc(ethStr)+'</span><span class="ph-greg">'+esc(gStr)+'</span></div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  el.innerHTML=yearNav+'<div class="ph-table">'+rowsHtml+'</div>';
+}
+function renderOrthodoxHols(){
+  const el=document.getElementById('hlist-orthodox');if(!el)return;
+  el.innerHTML=ORTHODOX_FASTING.map((h,i)=>buildHCard(h.en,h.am,h.note,'orthodox','ort_'+i)).join('');
+}
+function renderMuslimHols(){
+  const el=document.getElementById('hlist-muslim');if(!el)return;
+  el.innerHTML=MUSLIM_HOLIDAYS.map((h,i)=>buildHCard(h.en,h.am,h.note,'muslim','mus_'+i)).join('');
+}
+function renderDayNames(){
+  const el=document.getElementById('hlist-daynames');if(!el)return;
+  let html='<table class="dn-table"><thead><tr><th>Day</th><th>English</th><th>Amharic</th></tr></thead><tbody>';
+  html+=ORTHODOX_DAYS.map(d=>'<tr><td class="dn-day">'+d.day+'</td><td>'+esc(d.en)+'</td><td class="dn-eth">'+esc(d.am)+'</td></tr>').join('');
+  el.innerHTML=html+'</tbody></table>';
+}
+function renderYearlyFeasts(){
+  const el=document.getElementById('hlist-yearly');if(!el)return;
+  const todayEth=EthCal.gregToEth(new Date());
+  el.innerHTML=YEARLY_FEASTS.map(f=>{
+    const gDate=EthCal.ethToGreg(todayEth.year,f.ethM,f.day);
+    const gStr=gDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    return buildHCard(f.month+' '+f.day+' — '+f.en,f.am,f.month+' '+f.day+' E.C. ('+gStr+')','feast','feast_'+f.ethM+'_'+f.day);
+  }).join('');
+}
+function buildHCard(nameEn,nameAm,dateNote,badgeClass,photoKey){
+  const photos=DB.get('hphotos_'+photoKey,[])||[];
+  const thumb=photos.length?'<img src="'+esc(photos[0])+'" class="h-photo-thumb" alt=""/>':'';
+  return '<div class="h-item">'+
+    '<span class="h-badge '+badgeClass+'">'+(badgeClass==='public'?'🇪🇹':badgeClass==='orthodox'?'✝️':badgeClass==='muslim'?'☪️':'⭐')+'</span>'+
+    '<div class="h-info"><div class="h-name-en">'+esc(nameEn)+'</div>'+
+    (nameAm?'<div class="h-name-am">'+esc(nameAm)+'</div>':'')+
+    '<div class="h-date-tag">📅 '+esc(dateNote||'')+'</div></div>'+
+    thumb+'<button class="h-photo-btn" onclick="openHPhotoModal(\''+esc(photoKey)+'\',\''+esc(nameEn)+'\')"><i class="fas fa-camera"></i> Photos</button></div>';
+}
+function openHPhotoModal(key,title){
+  _curHPhotoKey=key;const t=document.getElementById('hPhotoTitle');if(t)t.textContent=title;
+  renderHPhotoGrid();document.getElementById('hPhotoOverlay').style.display='flex';
+}
+function renderHPhotoGrid(){
+  const photos=DB.get('hphotos_'+_curHPhotoKey,[])||[];
+  const grid=document.getElementById('hPhotoGrid');if(!grid)return;
+  if(!photos.length){grid.innerHTML='<div style="color:var(--muted);font-size:.78rem">No photos yet.</div>';return;}
+  grid.innerHTML=photos.map((src,i)=>'<div class="h-photo-item"><img src="'+esc(src)+'" alt=""/><button class="h-photo-del" onclick="delHPhoto('+i+')"><i class="fas fa-times"></i></button></div>').join('');
+}
+function addHolidayPhoto(input){
+  const files=[...input.files],photos=DB.get('hphotos_'+_curHPhotoKey,[])||[];let done=0;
+  files.forEach(file=>{const r=new FileReader();r.onload=e=>{photos.push(e.target.result);done++;if(done===files.length){DB.set('hphotos_'+_curHPhotoKey,photos);renderHPhotoGrid();renderAllHolidays();showToast('Photo added!');}};r.readAsDataURL(file);});
+  input.value='';
+}
+function delHPhoto(i){const p=DB.get('hphotos_'+_curHPhotoKey,[])||[];p.splice(i,1);DB.set('hphotos_'+_curHPhotoKey,p);renderHPhotoGrid();renderAllHolidays();}
+
+/* ── 15. PROFILE PAGE ── */
+function initProfilePage(){
+  const p=DB.get('profile',{})||{};
+  const f=(id,key)=>{const el=document.getElementById(id);if(el&&p[key])el.value=p[key];};
+  f('pfName','name');f('pfUsername','username');f('pfBio','bio');f('pfPhone','phone');f('pfDob','dob');
+  const pfL=document.getElementById('pfLanguage');if(pfL&&p.language)pfL.value=p.language;
+  if(p.gender)applyGender(p.gender);
+  if(p.avatar){const img=document.getElementById('profileAvatarImg');if(img){img.src=p.avatar;img.style.display='block';const pi=document.getElementById('profileAvatarInitial');if(pi)pi.style.display='none';}const ti=document.getElementById('topAvatarImg');if(ti){ti.src=p.avatar;ti.style.display='block';const tI=document.getElementById('topAvatarInitial');if(tI)tI.style.display='none';}}
+  if(p.name){const pi=document.getElementById('profileAvatarInitial');if(pi)pi.textContent=p.name.charAt(0).toUpperCase();const tI=document.getElementById('topAvatarInitial');if(tI)tI.textContent=p.name.charAt(0).toUpperCase();}
+  if(p.cover){const c=document.getElementById('profileCoverBg');if(c){c.style.backgroundImage='url('+p.cover+')';c.style.backgroundSize='cover';c.style.backgroundPosition='center';}}
+  updateProductivity();checkBadges();updateStreaks();renderRewards();
+}
+function saveProfile(){
+  const p=DB.get('profile',{})||{};
+  ['pfName:name','pfUsername:username','pfBio:bio','pfPhone:phone','pfDob:dob'].forEach(pair=>{
+    const[id,key]=pair.split(':');const el=document.getElementById(id);if(el)p[key]=el.value;
+  });
+  const pfL=document.getElementById('pfLanguage');if(pfL)p.language=pfL.value;
+  DB.set('profile',p);
+  if(p.name){const pi=document.getElementById('profileAvatarInitial');if(pi)pi.textContent=p.name.charAt(0).toUpperCase();const tI=document.getElementById('topAvatarInitial');if(tI)tI.textContent=p.name.charAt(0).toUpperCase();}
+}
+function uploadAvatar(input){
+  const file=input.files[0];if(!file)return;
+  const r=new FileReader();r.onload=e=>{
+    const src=e.target.result;
+    const img=document.getElementById('profileAvatarImg');if(img){img.src=src;img.style.display='block';}
+    const pi=document.getElementById('profileAvatarInitial');if(pi)pi.style.display='none';
+    const ti=document.getElementById('topAvatarImg');if(ti){ti.src=src;ti.style.display='block';}
+    const tI=document.getElementById('topAvatarInitial');if(tI)tI.style.display='none';
+    const p=DB.get('profile',{})||{};p.avatar=src;DB.set('profile',p);showToast('Avatar updated!');
+  };r.readAsDataURL(file);
+}
+function uploadCover(input){
+  const file=input.files[0];if(!file)return;
+  const r=new FileReader();r.onload=e=>{
+    const src=e.target.result,c=document.getElementById('profileCoverBg');
+    if(c){c.style.backgroundImage='url('+src+')';c.style.backgroundSize='cover';c.style.backgroundPosition='center';}
+    const p=DB.get('profile',{})||{};p.cover=src;DB.set('profile',p);showToast('Cover updated!');
+  };r.readAsDataURL(file);
+}
+function setGender(g){
+  const mb=document.getElementById('gBtn-male'),fb=document.getElementById('gBtn-female');
+  if(mb)mb.classList.toggle('active-male',g==='male');
+  if(fb)fb.classList.toggle('active-female',g==='female');
+  const p=DB.get('profile',{})||{};p.gender=g;DB.set('profile',p);
+  applyGender(g);showToast(g==='male'?'Theme: Blue 💙':'Theme: Pink 🌸');
+}
+function clearGender(){
+  const mb=document.getElementById('gBtn-male'),fb=document.getElementById('gBtn-female');
+  if(mb)mb.classList.remove('active-male');if(fb)fb.classList.remove('active-female');
+  document.getElementById('appBody').classList.remove('theme-male','theme-female');
+  const p=DB.get('profile',{})||{};delete p.gender;DB.set('profile',p);showToast('Gender cleared');
+}
+function applyGender(g){
+  const body=document.getElementById('appBody');body.classList.remove('theme-male','theme-female');
+  if(g==='male'){body.classList.add('theme-male');const mb=document.getElementById('gBtn-male');if(mb)mb.classList.add('active-male');}
+  else if(g==='female'){body.classList.add('theme-female');const fb=document.getElementById('gBtn-female');if(fb)fb.classList.add('active-female');}
+}
+function setLanguage(lang){
+  _lang=lang;
+  ['settingLanguage','pfLanguage'].forEach(id=>{const el=document.getElementById(id);if(el&&el.value!==lang)el.value=lang;});
+  const p=DB.get('profile',{})||{};p.language=lang;DB.set('profile',p);
+  saveSetting('language',lang);applyLanguage(lang);
+  showToast('Language saved / ቋንቋ ተቀምጧል');
+}
+function updateProductivity(){
+  const todos=[...document.querySelectorAll('#dp-todo .pb-item')];
+  const done=todos.filter(t=>t.classList.contains('done')).length;
+  const daily=todos.length>0?Math.round(done/todos.length*100):0;
+  const ws=weekStart(new Date());let wEvts=0;
+  for(let i=0;i<7;i++)wEvts+=(DB.get('events_'+fmtKey(addDays(ws,i)),[])||[]).length;
+  const weekly=Math.min(100,wEvts*10);
+  const td2=new Date(),dim=new Date(td2.getFullYear(),td2.getMonth()+1,0).getDate();let mEvts=0;
+  for(let i=1;i<=dim;i++)mEvts+=(DB.get('events_'+fmtKey(new Date(td2.getFullYear(),td2.getMonth(),i)),[])||[]).length;
+  const monthly=Math.min(100,mEvts*3),overall=Math.round((daily+weekly+monthly)/3);
+  [['prodDaily',daily,'#6c63ff'],['prodWeekly',weekly,'#00c8a0'],['prodMonthly',monthly,'#f5a623'],['prodOverall',overall,'#e94b77']].forEach(([id,pct,col])=>{
+    const bar=document.getElementById(id);if(bar){bar.style.width=pct+'%';bar.style.background=col;}
+    const lbl=document.getElementById(id+'Pct');if(lbl)lbl.textContent=pct+'%';
+  });
+  DB.set('productivity',{daily,weekly,monthly,overall});
+}
+function checkBadges(){
+  const s=DB.get('login_streak',0)||0,prod=DB.get('productivity',{})||{};
+  if(s>=5)unlockBadge('bronze');if(s>=20)unlockBadge('silver');
+  if(s>=50)unlockBadge('gold');if((prod.overall||0)>=90)unlockBadge('master');
+  if((DB.get('plan_streak',0)||0)>=7)unlockBadge('star');
+}
+function unlockBadge(id){const el=document.getElementById('badge-'+id);if(el)el.classList.replace('locked','unlocked');}
+function updateStreaks(){
+  const lsc=document.getElementById('loginStreakCount');if(lsc)lsc.textContent=DB.get('login_streak',0)||0;
+  const psc=document.getElementById('planningStreakCount');if(psc)psc.textContent=DB.get('plan_streak',0)||0;
+}
+function addCustomReward(){
+  const g=document.getElementById('rewardGoal'),r=document.getElementById('rewardName');
+  const goal=(g?g.value:'').trim(),reward=(r?r.value:'').trim();
+  if(!goal||!reward){showToast(T('enterTitle'));return;}
+  const rw=DB.get('rewards',[])||[];rw.push({goal,reward,id:Date.now()});DB.set('rewards',rw);
+  if(g)g.value='';if(r)r.value='';renderRewards();showToast('Reward added!');
+}
+function renderRewards(){
+  const rw=DB.get('rewards',[])||[],el=document.getElementById('rewardsList');if(!el)return;
+  if(!rw.length){el.innerHTML='<div style="color:var(--muted);font-size:.78rem">No rewards yet.</div>';return;}
+  el.innerHTML=rw.map((r,i)=>'<div class="reward-item"><span class="ri-goal">🎯 '+esc(r.goal)+'</span><span class="ri-reward">🎁 '+esc(r.reward)+'</span><button class="ri-del" onclick="delReward('+i+')"><i class="fas fa-trash"></i></button></div>').join('');
+}
+function delReward(i){const rw=DB.get('rewards',[])||[];rw.splice(i,1);DB.set('rewards',rw);renderRewards();}
+function updateNotifBadge(){
+  const n=(DB.get('events_'+fmtKey(new Date()),[])||[]).length;
+  const b=document.getElementById('notifBadge');if(b){b.textContent=n;b.style.display=n?'flex':'none';}
+}
+
+/* ── 16. SETTINGS PAGE ── */
+function initSettingsPage(){
+  const s=DB.get('settings',{})||{};
+  const st=document.getElementById('settingTheme');if(st&&s.theme)st.value=s.theme;
+  const sl=document.getElementById('settingLanguage');if(sl&&s.language)sl.value=s.language;
+  const sp=document.getElementById('settingPrimaryCal');if(sp&&s.primaryCal)sp.value=s.primaryCal;
+  [['setFingerprint','fingerprint'],['setFaceId','faceid'],['setPubH','pubh'],
+   ['setOrtH','orth'],['setMusH','mush'],['setHNotif','hnotif'],['setCloud','cloud']].forEach(([id,k])=>{
+    const el=document.getElementById(id);if(el&&s[k]!==undefined)el.checked=s[k];
+  });
+  const das=document.getElementById('settingDefaultAlarmSound');
+  if(das){
+    das.innerHTML=Object.entries(ALARM_SOUNDS).map(([k,v])=>'<option value="'+k+'">'+v.label+'</option>').join('');
+    das.value=s.defaultAlarmSound||'bell';
+  }
+}
+function saveSetting(k,v){const s=DB.get('settings',{})||{};s[k]=v;DB.set('settings',s);}
+function saveDefaultAlarmSound(v){saveSetting('defaultAlarmSound',v);showToast('Default alarm sound updated 🔔');}
+function previewDefaultAlarmSound(){
+  const sel=document.getElementById('settingDefaultAlarmSound');
+  playAlarmSound(sel?sel.value:'bell',1);
+}
+function setTheme(theme){
+  const body=document.getElementById('appBody');body.classList.remove('theme-light','theme-dark');
+  if(theme==='system')body.classList.add(window.matchMedia('(prefers-color-scheme:dark)').matches?'theme-dark':'theme-light');
+  else body.classList.add('theme-'+theme);
+  const p=DB.get('profile',{})||{};if(p.gender)applyGender(p.gender);
+  const icon=document.querySelector('#themeToggleBtn i');
+  if(icon)icon.className=body.classList.contains('theme-dark')?'fas fa-sun':'fas fa-moon';
+  saveSetting('theme',theme);
+}
+function openPasswordModal(){document.getElementById('pwModalOverlay').style.display='flex';}
+function savePassword(){
+  const pw1=document.getElementById('pw1'),pw2=document.getElementById('pw2');
+  const v1=pw1?pw1.value:'',v2=pw2?pw2.value:'';
+  if(!v1){showToast(T('enterTitle'));return;}
+  if(v1!==v2){showToast('Passwords do not match');return;}
+  DB.set('app_password',btoa(v1+'_ep'));document.getElementById('pwModalOverlay').style.display='none';
+  showToast('Password set!');
+}
+function backupData(){
+  try{
+    const backup={};
+    for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('ep_'))backup[k]=localStorage.getItem(k);}
+    const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download='ethioplanner_backup_'+fmtKey(new Date())+'.json';a.click();URL.revokeObjectURL(url);
+    showToast('Backup downloaded!');
+  }catch(e){showToast('Backup failed: '+e.message);}
+}
+function exportData(){
+  try{
+    let csv='Date,Title,Sticker,Time,Alarm,AlarmSound,Repeat,CalendarType\n';
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k&&k.startsWith('ep_events_')){
+        const dateKey=k.replace('ep_events_','');
+        (JSON.parse(localStorage.getItem(k)||'[]')||[]).forEach(ev=>{
+          csv+='"'+dateKey+'","'+(ev.title||'')+'","'+(ev.sticker||'')+'","'+(ev.time||'')+'","'+(ev.alarm?'yes':'no')+'","'+(ev.alarmSound||'bell')+'","'+(ev.repeat||'never')+'","'+(ev.calType||'gregorian')+'"\n';
+        });
+      }
+    }
+    const blob=new Blob([csv],{type:'text/csv'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download='ethioplanner_export_'+fmtKey(new Date())+'.csv';a.click();URL.revokeObjectURL(url);
+    showToast('Exported as CSV!');
+  }catch(e){showToast('Export failed: '+e.message);}
+}
+function shareApp(){
+  if(navigator.share)navigator.share({title:'Ethio Planner',text:'Ethiopian & Gregorian dual calendar planner!',url:window.location.href}).catch(()=>{});
+  else navigator.clipboard.writeText(window.location.href).then(()=>showToast('Link copied!'));
+}
+
+/* ── 17. CHATBOT ── */
+let _chatOpen=false;
+function toggleChatbot(){
+  _chatOpen=!_chatOpen;
+  document.getElementById('chatbotModal').style.display=_chatOpen?'flex':'none';
+  if(_chatOpen)document.getElementById('chatbotInput').focus();
+}
+function sendChat(){
+  const inp=document.getElementById('chatbotInput'),msg=inp.value.trim();if(!msg)return;
+  addChatMsg(msg,'user');inp.value='';
+  setTimeout(()=>addChatMsg(getBotReply(msg.toLowerCase()),'bot'),550);
+}
+function addChatMsg(text,type){
+  const m=document.getElementById('chatbotMsgs');if(!m)return;
+  const d=document.createElement('div');d.className=type+'-msg';d.textContent=text;
+  m.appendChild(d);m.scrollTop=m.scrollHeight;
+}
+/* Day Teller: parses a date the user typed (many formats) and reports its weekday */
+function tryDayTeller(raw){
+  if(!/\d/.test(raw))return null;
+  let d=null,m;
+  if((m=raw.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/))){ // 2026-07-01
+    d=new Date(+m[1],+m[2]-1,+m[3]);
+  }else if((m=raw.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/))){ // 07/01/2026 (month/day/year)
+    d=new Date(+m[3],+m[1]-1,+m[2]);
+  }else if(/(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i.test(raw)){ // "jul 1, 2026" / "1 july 2026"
+    const cleaned=raw.replace(/,/g,' ').replace(/[^a-z0-9\s]/gi,' ').replace(/\s+/g,' ').trim();
+    const parsed=new Date(cleaned);
+    if(!isNaN(parsed))d=parsed;
+  }
+  if(!d||isNaN(d))return null;
+  const DOW_FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const eth=EthCal.gregToEth(d);
+  return fmtDate(d,{weekday:'long',month:'long',day:'numeric',year:'numeric'})+' is a '+DOW_FULL[d.getDay()]+'.\nEthiopian: '+eth.monthName+' ('+eth.monthNameEn+') '+eth.day+', '+eth.year+' E.C.';
+}
+function getBotReply(msg){
+  const today=new Date(),eth=EthCal.gregToEth(today);
+  const dayTellerReply=tryDayTeller(msg);
+  if(dayTellerReply)return dayTellerReply;
+  if(msg.includes('today')||msg.includes('date')||msg.includes('ዛሬ'))
+    return 'Today: '+fmtDate(today,{weekday:'long',month:'long',day:'numeric',year:'numeric'})+'\nEthiopian: '+eth.monthName+' '+eth.day+', '+eth.year+' E.C.';
+  if(msg.includes('year')||msg.includes('2018'))
+    return 'Ethiopian year: '+eth.year+' E.C. ('+GREG_MONTHS[today.getMonth()]+' '+today.getFullYear()+' Gregorian)';
+  if(msg.includes('alarm')||msg.includes('sound')||msg.includes('ማንቂያ'))
+    return 'Alarm sound: Add an entry, enable Alarm, then choose Bell, Chime, Digital, Gentle, Alert, Church, or Soft — or upload your own custom audio file!';
+  if(msg.includes('amharic')||msg.includes('አማርኛ')||msg.includes('language')||msg.includes('ቋንቋ'))
+    return 'To change language: go to Settings or Mine page → Language. Supports English, Amharic (አማርኛ), Afaan Oromo, and Tigrinya (ትግርኛ).';
+  if(msg.includes('michael')||msg.includes('ሚካኤል'))return 'St. Michael is celebrated on the 12th of every Ethiopian month. Major feast: Hidar 12.';
+  if(msg.includes('gabriel')||msg.includes('ገብርኤል'))return 'St. Gabriel: 19th of every Ethiopian month. Major feast: Tahsas 19.';
+  if(msg.includes('mary')||msg.includes('ማርያም'))return 'Holy Virgin Mary: 21st of every Ethiopian month.';
+  if(msg.includes('meskel'))return 'Meskel: Meskerem 17 E.C. / September 27 Gregorian.';
+  if(msg.includes('christmas')||msg.includes('genna'))return 'Ethiopian Christmas (Genna): Tahsas 29 E.C. / January 7 Gregorian.';
+  if(msg.includes('timkat'))return 'Timkat: Tir 11 E.C. / January 19 Gregorian.';
+  if(msg.includes('new year')||msg.includes('enkutatash'))return 'Ethiopian New Year: Meskerem 1 E.C. / September 11 Gregorian.';
+  if(msg.includes('period')||msg.includes('cycle')||msg.includes('ወር አበባ'))return 'Use Special Day Reminder on Home to track your cycle and set a 1-day alarm!';
+  if(msg.includes('hello')||msg.includes('selam')||msg.includes('ሰላም'))return 'Selam! I am your Ethio Planner assistant. Ask about dates, holidays, alarms, or language!';
+  if(msg.includes('badge')||msg.includes('achievement'))return 'Earn badges in Mine → Achievements! Login streaks unlock Bronze (5), Silver (20), Gold (50), Master badges.';
+  const tips=['Tip: Right-click a Period Tracker cell to cycle through pain levels!','Tip: Save daily plans to My Files for quick access.','Tip: Pin important plans in My Files!','Tip: Use Go to date to jump to any date instantly.','Tip: Choose a custom alarm sound when creating an entry!'];
+  return tips[Math.floor(Math.random()*tips.length)]+'\n\nAsk me anything about Ethio Planner!';
+}
+
+/* ── 18. LOGIN STREAK + THEME + APP INIT ── */
+function updateLoginStreak(){
+  const today=fmtKey(new Date()),last=DB.get('last_login',''),streak=DB.get('login_streak',0)||0;
+  if(last===today)return;
+  const yest=fmtKey(addDays(new Date(),-1));
+  DB.set('login_streak',last===yest?streak+1:1);
+  DB.set('last_login',today);
+}
+function initTheme(){
+  const s=DB.get('settings',{})||{},body=document.getElementById('appBody');
+  body.classList.remove('theme-light','theme-dark','theme-male','theme-female');
+  if(s.theme==='system')body.classList.add(window.matchMedia('(prefers-color-scheme:dark)').matches?'theme-dark':'theme-light');
+  else if(s.theme)body.classList.add('theme-'+s.theme);
+  else body.classList.add('theme-light');
+  const p=DB.get('profile',{})||{};if(p.gender)applyGender(p.gender);
+  const icon=document.querySelector('#themeToggleBtn i');
+  if(icon)icon.className=body.classList.contains('theme-dark')?'fas fa-sun':'fas fa-moon';
+  const btn=document.getElementById('themeToggleBtn');
+  if(btn)btn.onclick=function(){
+    const dark=document.getElementById('appBody').classList.contains('theme-dark');
+    setTheme(dark?'light':'dark');
+    const sel=document.getElementById('settingTheme');if(sel)sel.value=dark?'light':'dark';
+  };
+}
+function initApp(){
+  updateLoginStreak();initTheme();requestNotifPermission();
+  // Restore language
+  const savedLang=(DB.get('settings',{})||{}).language||(DB.get('profile',{})||{}).language||DB.get('lang','')||'en';
+  _lang=savedLang;
+  // Restore custom alarm sound
+  const savedUrl=DB.get('custom_sound_url');if(savedUrl)_customSoundUrl=savedUrl;
+  // Top bar avatar
+  const p=DB.get('profile',{})||{};
+  if(p.name){const tI=document.getElementById('topAvatarInitial');if(tI)tI.textContent=p.name.charAt(0).toUpperCase();}
+  if(p.avatar){const ti=document.getElementById('topAvatarImg');if(ti){ti.src=p.avatar;ti.style.display='block';const tI=document.getElementById('topAvatarInitial');if(tI)tI.style.display='none';}}
+  updateNotifBadge();
+  startAlarmChecker();
+  applyLanguage(_lang);
+  // Open scheduler section by default
+  toggleSection('scheduler');
+  navigate('home');
+}
+document.addEventListener('DOMContentLoaded', initApp);
+
+</script>
+</body>
+</html>
